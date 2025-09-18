@@ -1,0 +1,53 @@
+STT,Ngành/ Chuyên ngành tuyển sinh,Mã xét tuyển,Mã tổ hợp,Năm 2020,Năm 2021,Năm 2022,Năm 2023,Năm 2024,Năm 2025
+1,Kiến trúc,7580101,"V00,V02,V10",21.75,22.75,20.59,21.05,21.9,21.9
+2,Kiến trúc/ Kiến trúc công nghệ,7580101_02,"V00,V02",20.75,22.25,20.00,20.64,21.3,20.5
+3,Kiến trúc nội thất,7580103,"V00,V02",22.50,24.00,22.60,21.53,21.5,21.0
+4,Kiến trúc cảnh quan,7580102,"V00,V02,V06",chưa tuyển,21.25,18.00,19.23,21.2,20.4
+5,Quy hoạch vùng và đô thị,7580105,"V00,V01,V02",16.00,17.50,16.00,17.00,21.1,21.3
+6,Mỹ thuật đô thị,7210110,"H01,H06,V00,V02",Chưa tuyển,Chưa tuyển,Chưa tuyển,Chưa tuyển,18.01,22.3
+7,Kỹ thuật xây dựng,7580201,"A00,A01,D01,D07",16.00,18.50,16.00,17.00,21.9,23.85
+8,Kỹ thuật xây dựng/ Xây dựng dân dụng và công nghiệp,7580201_01,"A00,A01,D07,D24,D29",21.75,23.50,20.00,20.00,22.5,24.0
+9,Kỹ thuật xây dựng/ Hệ thống kỹ thuật trong công trình,7580201_02,"A00,A01,D07",19.75,22.25,20.00,20.00,22.3,23.25
+10,Kỹ thuật xây dựng/ Tin học xây dựng,7580201_03,"A00,A01,D01,D07",19.00,23.00,20.75,21.20,23.2,23.85
+11,Kỹ thuật xây dựng/ Kỹ thuật công trình thủy,7580201_04,"A00,A01,D01,D07","Tuyển sinh chung của ngành
+			Kỹ thuật xây dựng","Tuyển sinh chung của ngành
+			Kỹ thuật xây dựng","Tuyển sinh chung của ngành
+			Kỹ thuật xây dựng","Tuyển sinh chung của ngành
+			Kỹ thuật xây dựng",17.0,21.0
+12,Kỹ thuật xây dựng/ Kỹ thuật công trình biển,7580201_05,"A00,A01,D01,D07",,,,,17.0,22.4
+13,Kỹ thuật xây dựng công trình giao thông/ Xây dựng Cầu đường,7580205_01,"A00,A01,D01,D07",16.00,17.25,16.00,18.00,21.45,23.0
+14,Kỹ thuật cấp thoát nước/ Kỹ thuật nước - Môi trường nước,7580213_01,"A00,A01,B00,D07",16.00,16.00,16.00,17.00,17.0,21.65
+15,Kỹ thuật môi trường,7520320,"A00,A01,B00,D07",16.00,16.00,16.00,17.00,17.0,23.0
+16,Kỹ thuật vật liệu,7520309,"A00,A01,B00,D07",16.00,16.00,16.00,17.00,21.2,24.3
+17,Công nghệ kỹ thuật vật liệu xây dựng,7510105,"A00,A01,B00,D07",16.00,16.00,16.00,17.00,19.75,23.3
+18,Công nghệ thông tin,7480201,"A00,A01,D01,D07",24.25,25.35,25.40,24.25,24.75,25.6
+19,Công nghệ thông tin/ Công nghệ đa phương tiện,7480201_01,"A00,A01,D01,D07",chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,24.0,25.1
+20,Khoa học máy tính,7480101,"A00,A01,D01,D07",23.00,25.00,24.90,23.91,24.6,25.5
+21,Kỹ thuật cơ khí,7520103,"A00,A01,D07",16.00,22.25,22.25,22.65,24.0,25.6
+22,Kỹ thuật cơ khí/ Máy xây dựng,7520103_01,"A00,A01,D07",16.00,16.00,16.00,17.00,20.75,23.4
+23,Kỹ thuật cơ khí/ Kỹ thuật cơ điện,7520103_03,"A00,A01,D07",16.00,21.75,22.10,22.40,23.95,25.3
+24,Kỹ thuật cơ khí/ Kỹ thuật ô tô,7520103_04,"A00,A01,D07",chưa tuyển,23.25,23.70,23.37,24.35,25.4
+25,Kỹ thuật điện,7520201,"A00,A01,D07",Chưa tuyển,Chưa tuyển,Chưa tuyển,19.20,23.8,25.75
+26,Kinh tế xây dựng,7580301,"A00,A01,D01,D07",21.75,24.00,22.95,22.40,23.9,24.9
+27,Quản lý xây dựng/ Kinh tế và quản lý đô thị,7580302_01,"A00,A01,D01,D07",20.00,23.25,21.40,21.25,23.45,23.65
+28,Quản lý xây dựng/ Kinh tế và quản lý bất động sản,7580302_02,"A00,A01,D01,D07",19.50,23.50,22.30,21.50,23.25,23.65
+29,"Quản lý xây dựng/ Quản lý hạ tầng, đất đai đô thị",7580302_03,"A00,A01,D01,D07",chưa tuyển,16.00,16.55,19.40,22.5,24.0
+30,Quản lý xây dựng/ Kiểm toán đầu tư xây dựng,7580302_04,"A00,A01,D01,D07",Chưa tuyển,Chưa tuyển,Chưa tuyển,Chưa tuyển,22.9,24.35
+31,Quản lý dự án,7340409,"A00,A01,D01,D07",Chưa tuyển,Chưa tuyển,Chưa tuyển,Chưa tuyển,21.0,24.55
+32,Logistics và quản lý chuỗi cung ứng,7510605,"A00,A01,D01,D07",chưa tuyển,24.75,25.00,24.49,24.8,25.6
+33,Logistics và quản lý chuỗi cung ứng/ Logistics đô thị,7510605,"A00,A01,D01,D07",Chưa tuyển,Chưa tuyển,Chưa tuyển,Chưa tuyển,23.9,25.6
+34,"Kỹ thuật xây dựng (Chương trình đào tạo kỹ sư chất lượng cao - PFIEV), gồm 4 chuyên ngành:
+			 - Cơ sở Hạ tầng giao thông
+			 - Kỹ thuật đô thị
+			 - Kỹ thuật Công trình thuỷ
+			 - Vật liệu xây dựng",7580201_CLC,"A00,A01,D01,D07,D24,D29",20,21.00,20.00,20.00,20.0,21.0
+35,CTĐT Nghệ thuật và thiết kế,72104_NT,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,23.3
+36,Công nghệ kỹ thuật xây dựng,7510103,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,23.6
+37,Kỹ thuật xây dựng công trình giao thông/ Đường sắt tốc độ cao và đường sắt đô thị,7580205_02,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,22.45
+38,CNTT/ An toàn thông tin,7480201_02,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,25.35
+39,Khoa học dữ liệu,7460108,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,25.0
+40,Kỹ thuật điều khiển và tự động hóa,7520216,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,27.0
+41,Logistics và QL chuỗi cung ứng/ Logistics đô thị,7510605_01,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,25.0
+42,Logistics và QL chuỗi cung ứng/ Logistics công nghiệp,7510605_02,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,25.2
+43,Kỹ thuật xây dựng (liên kết Hoa Kỳ),7580201_QT,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,22.0
+44,Khoa học máy tính (liên kết Hoa Kỳ),7480101_QT,NAN,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,chưa tuyển,22.7

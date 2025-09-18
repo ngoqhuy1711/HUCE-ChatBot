@@ -1,0 +1,636 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Response templates động cho chatbot tư vấn tuyển sinh HUCE. Dùng placeholder để nối DB/API.",
+    "placeholders": {
+      "entity": "Tên/mã ngành, tổ hợp, phương thức, chứng chỉ...",
+      "method": "Phương thức xét tuyển (thi THPT, học bạ, TSA/SPT/V-SAT, chứng chỉ...)",
+      "combo": "Tổ hợp môn (A00, A01, D01, V00...)",
+      "deadline": "Mốc thời gian (ngày/tháng/năm hoặc khoảng thời gian)",
+      "year": "Năm tuyển sinh",
+      "value": "Giá trị động: điểm, học phí, chỉ tiêu...",
+      "location": "Địa điểm dự thi/nộp hồ sơ",
+      "url": "Liên kết chi tiết",
+      "note": "Ghi chú bổ sung hoặc điều kiện",
+      "source": "Nguồn tham chiếu chính thức"
+    }
+  },
+  "intents": [
+    {
+      "intent": "chao_hoi",
+      "responses": [
+        {
+          "text": "Chào bạn. Bạn muốn tra cứu tuyển sinh nội dung gì: ngành, phương thức, tổ hợp, mốc thời gian hay học phí?"
+        }
+      ],
+      "suggestions": [
+        "Hỏi ngành",
+        "Phương thức xét tuyển",
+        "Tổ hợp môn",
+        "Mốc thời gian",
+        "Học phí"
+      ]
+    },
+    {
+      "intent": "ask_major_info",
+      "responses": [
+        {
+          "text": "Ngành {entity} tuyển sinh năm {year}. Tổ hợp chính: {combo}. Phương thức áp dụng: {method}. Chi tiết: {url}"
+        },
+        {
+          "text": "Thông tin ngành {entity}: chỉ tiêu {value}, tổ hợp {combo}, phương thức {method}. Bạn cần xem chuẩn đầu vào hoặc học phí không?"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có đủ dữ liệu cho ngành {entity}. Bạn có thể chỉ định mã ngành để tôi tra chính xác hơn không?"
+      },
+      "suggestions": [
+        "Điểm chuẩn năm trước",
+        "Chỉ tiêu",
+        "Học phí",
+        "Tổ hợp môn"
+      ]
+    },
+    {
+      "intent": "ask_admission_method",
+      "responses": [
+        {
+          "text": "Trường áp dụng các phương thức: {method}. Với {entity} bạn có thể dùng: {method}. Hướng dẫn chi tiết: {url}"
+        },
+        {
+          "text": "Có thể xét tuyển bằng {method}. Lưu ý: {note}. Mốc đăng ký: {deadline}. Xem thêm: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa tìm thấy {method} cho {entity}. Bạn muốn chuyển sang xét theo thi THPT hay học bạ?"
+      },
+      "suggestions": [
+        "Thời gian đăng ký",
+        "Tổ hợp môn",
+        "Điểm sàn"
+      ]
+    },
+    {
+      "intent": "ask_subject_combination",
+      "responses": [
+        {
+          "text": "{entity} xét các tổ hợp: {combo}. Bạn có điểm tổ hợp nào để tôi gợi ý phù hợp không?"
+        },
+        {
+          "text": "Khối {combo} gồm các môn tương ứng. Một số ngành nổi bật dùng {combo}: {entity}. Tham khảo: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có cấu hình tổ hợp cho {entity}. Bạn có thể cung cấp mã ngành để tôi tra cứu nhanh hơn?"
+      },
+      "suggestions": [
+        "Điểm sàn theo tổ hợp",
+        "Phương thức áp dụng",
+        "Chỉ tiêu"
+      ]
+    },
+    {
+      "intent": "ask_deadline",
+      "responses": [
+        {
+          "text": "Mốc thời gian {deadline}. Bạn cần tôi tạo nhắc lịch không?"
+        },
+        {
+          "text": "Thời hạn cho {method}: {deadline}. Sau hạn này hệ thống sẽ đóng nhận đăng ký."
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có {deadline} cụ thể. Bạn muốn xem lịch tổng tuyển sinh năm {year} không?"
+      },
+      "suggestions": [
+        "Lịch tổng 2025",
+        "Cách đăng ký",
+        "Hồ sơ cần nộp"
+      ]
+    },
+    {
+      "intent": "ask_quota",
+      "responses": [
+        {
+          "text": "Chỉ tiêu {year} cho {entity} là {value} sinh viên. Tham khảo đề án: {url}"
+        },
+        {
+          "text": "Kế hoạch tuyển sinh {entity}: {value}. Lưu ý có thể điều chỉnh theo thông báo chính thức."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có chỉ tiêu cập nhật cho {entity}. Bạn muốn tôi trả về chỉ tiêu năm trước không?"
+      },
+      "suggestions": [
+        "Điểm chuẩn năm trước",
+        "Phương thức áp dụng"
+      ]
+    },
+    {
+      "intent": "ask_previous_score",
+      "responses": [
+        {
+          "text": "Điểm chuẩn {entity} năm {year} là {value} theo {method}. Bạn muốn so sánh với năm khác không?"
+        },
+        {
+          "text": "Mức trúng tuyển {entity} {year}: {value}. Nguồn: {source}. Xem chi tiết: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có dữ liệu điểm chuẩn {entity} năm {year}. Tôi có thể đưa mức trung vị các năm gần đây."
+      },
+      "suggestions": [
+        "Xem 3 năm gần nhất",
+        "Điểm sàn năm nay"
+      ]
+    },
+    {
+      "intent": "ask_fee",
+      "responses": [
+        {
+          "text": "Học phí {entity} hiện tại: {value}/năm. Có thể khác nhau theo chương trình (CLC, QT). Tham khảo: {url}"
+        },
+        {
+          "text": "Mức học phí năm {year}: {value}. Ghi chú: {note}."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có học phí cập nhật. Bạn muốn xem mức năm trước không?"
+      },
+      "suggestions": [
+        "Học phí chương trình CLC",
+        "Các khoản thu khác"
+      ]
+    },
+    {
+      "intent": "ask_condition",
+      "responses": [
+        {
+          "text": "Điều kiện {method}: {value}. Ví dụ học bạ yêu cầu tổng 3 môn ≥ 18 và không môn nào dưới 5.5."
+        },
+        {
+          "text": "Để xét theo {method}, cần: {value}. Nếu thiếu chứng chỉ, bạn có thể xét phương thức khác."
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có điều kiện chi tiết cho {method}. Bạn muốn xem quy định chung không?"
+      },
+      "suggestions": [
+        "Quy đổi IELTS",
+        "Điều kiện học bạ",
+        "Tuyển thẳng"
+      ]
+    },
+    {
+      "intent": "ask_direct_admission",
+      "responses": [
+        {
+          "text": "Tuyển thẳng/Ưu tiên: {value}. Hồ sơ minh chứng nộp trước {deadline}. Chi tiết: {url}"
+        },
+        {
+          "text": "Diện tuyển thẳng áp dụng cho: {value}. Bạn thuộc diện nào để tôi kiểm tra kỹ hơn?"
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có chi tiết diện tuyển thẳng. Bạn có thể cung cấp giải/ chứng chỉ cụ thể?"
+      },
+      "suggestions": [
+        "Mốc thời gian hồ sơ",
+        "Liên hệ tư vấn"
+      ]
+    },
+    {
+      "intent": "fallback",
+      "responses": [
+        {
+          "text": "Tôi chưa hiểu câu hỏi. Bạn muốn tra cứu ngành, phương thức, tổ hợp, mốc thời gian hay học phí?"
+        },
+        {
+          "text": "Bạn có thể nói rõ hơn không. Ví dụ: 'CNTT xét tổ hợp nào?'"
+        }
+      ]
+    },
+    {
+      "intent": "ask_major_intro",
+      "responses": [
+        {
+          "text": "Ngành {entity}: {value}. Bạn có muốn tôi cung cấp thêm cơ hội việc làm không?"
+        },
+        {
+          "text": "Giới thiệu về {entity}: {value}. Bạn cần xem thông tin tuyển sinh (tổ hợp, điểm chuẩn, học phí) không?"
+        }
+      ],
+      "fallback": {
+        "text": "Hiện chưa có thông tin giới thiệu ngành {entity}. Bạn muốn tôi trả về đề án tuyển sinh chính thức không?"
+      },
+      "suggestions": [
+        "Cơ hội việc làm",
+        "Điểm chuẩn",
+        "Học phí"
+      ]
+    },
+    {
+      "intent": "ask_career_opportunity",
+      "responses": [
+        {
+          "text": "Sinh viên ngành {entity} sau khi tốt nghiệp có thể làm: {value}."
+        },
+        {
+          "text": "Cơ hội nghề nghiệp của {entity}: {value}. Bạn có muốn tôi hiển thị điểm chuẩn hoặc học phí không?"
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có thông tin cơ hội việc làm cho ngành {entity}. Bạn muốn tôi tìm theo ngành gần nhất không?"
+      },
+      "suggestions": [
+        "Giới thiệu ngành học",
+        "Điểm chuẩn",
+        "Phương thức xét tuyển"
+      ]
+    },
+    {
+      "intent": "ask_major_info",
+      "responses": [
+        {
+          "text": "Ngành {entity} tuyển sinh năm {year}. Tổ hợp chính: {combo}. Phương thức áp dụng: {method}. Chi tiết: {url}"
+        },
+        {
+          "text": "Thông tin ngành {entity}: chỉ tiêu {value}, tổ hợp {combo}, phương thức {method}. Bạn cần xem chuẩn đầu vào hoặc học phí không?"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có đủ dữ liệu cho ngành {entity}. Bạn có thể chỉ định mã ngành để tôi tra chính xác hơn không?"
+      },
+      "suggestions": [
+        "Điểm chuẩn năm trước",
+        "Chỉ tiêu",
+        "Học phí",
+        "Tổ hợp môn"
+      ]
+    },
+    {
+      "intent": "ask_admission_method",
+      "responses": [
+        {
+          "text": "Trường áp dụng các phương thức: {method}. Với {entity} bạn có thể dùng: {method}. Hướng dẫn chi tiết: {url}"
+        },
+        {
+          "text": "Có thể xét tuyển bằng {method}. Lưu ý: {note}. Mốc đăng ký: {deadline}. Xem thêm: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa tìm thấy {method} cho {entity}. Bạn muốn chuyển sang xét theo thi THPT hay học bạ?"
+      },
+      "suggestions": [
+        "Thời gian đăng ký",
+        "Tổ hợp môn",
+        "Điểm sàn"
+      ]
+    },
+    {
+      "intent": "ask_subject_combination",
+      "responses": [
+        {
+          "text": "{entity} xét các tổ hợp: {combo}. Bạn có điểm tổ hợp nào để tôi gợi ý phù hợp không?"
+        },
+        {
+          "text": "Khối {combo} gồm các môn tương ứng. Một số ngành nổi bật dùng {combo}: {entity}. Tham khảo: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có cấu hình tổ hợp cho {entity}. Bạn có thể cung cấp mã ngành để tôi tra cứu nhanh hơn?"
+      },
+      "suggestions": [
+        "Điểm sàn theo tổ hợp",
+        "Phương thức áp dụng",
+        "Chỉ tiêu"
+      ]
+    },
+    {
+      "intent": "ask_deadline",
+      "responses": [
+        {
+          "text": "Mốc thời gian {deadline}. Bạn cần tôi tạo nhắc lịch không?"
+        },
+        {
+          "text": "Thời hạn cho {method}: {deadline}. Sau hạn này hệ thống sẽ đóng nhận đăng ký."
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có {deadline} cụ thể. Bạn muốn xem lịch tổng tuyển sinh năm {year} không?"
+      },
+      "suggestions": [
+        "Lịch tổng 2025",
+        "Cách đăng ký",
+        "Hồ sơ cần nộp"
+      ]
+    },
+    {
+      "intent": "ask_quota",
+      "responses": [
+        {
+          "text": "Chỉ tiêu {year} cho {entity} là {value} sinh viên. Tham khảo đề án: {url}"
+        },
+        {
+          "text": "Kế hoạch tuyển sinh {entity}: {value}. Lưu ý có thể điều chỉnh theo thông báo chính thức."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có chỉ tiêu cập nhật cho {entity}. Bạn muốn tôi trả về chỉ tiêu năm trước không?"
+      },
+      "suggestions": [
+        "Điểm chuẩn năm trước",
+        "Phương thức áp dụng"
+      ]
+    },
+    {
+      "intent": "ask_previous_score",
+      "responses": [
+        {
+          "text": "Điểm chuẩn {entity} năm {year} là {value} theo {method}. Bạn muốn so sánh với năm khác không?"
+        },
+        {
+          "text": "Mức trúng tuyển {entity} {year}: {value}. Nguồn: {source}. Xem chi tiết: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có dữ liệu điểm chuẩn {entity} năm {year}. Tôi có thể đưa mức trung vị các năm gần đây."
+      },
+      "suggestions": [
+        "Xem 3 năm gần nhất",
+        "Điểm sàn năm nay"
+      ]
+    },
+    {
+      "intent": "ask_fee",
+      "responses": [
+        {
+          "text": "Học phí {entity} hiện tại: {value}/năm. Có thể khác nhau theo chương trình (CLC, QT). Tham khảo: {url}"
+        },
+        {
+          "text": "Mức học phí năm {year}: {value}. Ghi chú: {note}."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có học phí cập nhật. Bạn muốn xem mức năm trước không?"
+      },
+      "suggestions": [
+        "Học phí chương trình CLC",
+        "Các khoản thu khác"
+      ]
+    },
+    {
+      "intent": "ask_condition",
+      "responses": [
+        {
+          "text": "Điều kiện {method}: {value}. Ví dụ học bạ yêu cầu tổng 3 môn ≥ 18 và không môn nào dưới 5.5."
+        },
+        {
+          "text": "Để xét theo {method}, cần: {value}. Nếu thiếu chứng chỉ, bạn có thể xét phương thức khác."
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có điều kiện chi tiết cho {method}. Bạn muốn xem quy định chung không?"
+      },
+      "suggestions": [
+        "Quy đổi IELTS",
+        "Điều kiện học bạ",
+        "Tuyển thẳng"
+      ]
+    },
+    {
+      "intent": "ask_direct_admission",
+      "responses": [
+        {
+          "text": "Tuyển thẳng/Ưu tiên: {value}. Hồ sơ minh chứng nộp trước {deadline}. Chi tiết: {url}"
+        },
+        {
+          "text": "Diện tuyển thẳng áp dụng cho: {value}. Bạn thuộc diện nào để tôi kiểm tra kỹ hơn?"
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có chi tiết diện tuyển thẳng. Bạn có thể cung cấp giải/ chứng chỉ cụ thể?"
+      },
+      "suggestions": [
+        "Mốc thời gian hồ sơ",
+        "Liên hệ tư vấn"
+      ]
+    },
+    {
+      "intent": "fallback",
+      "responses": [
+        {
+          "text": "Tôi chưa hiểu câu hỏi. Bạn muốn tra cứu ngành, phương thức, tổ hợp, mốc thời gian hay học phí?"
+        },
+        {
+          "text": "Bạn có thể nói rõ hơn không. Ví dụ: 'CNTT xét tổ hợp nào?'"
+        }
+      ]
+    },
+    {
+      "intent": "ask_major_intro",
+      "responses": [
+        {
+          "text": "Ngành {entity}: {value}. Bạn có muốn tôi cung cấp thêm cơ hội việc làm không?"
+        },
+        {
+          "text": "Giới thiệu về {entity}: {value}. Bạn cần xem thông tin tuyển sinh (tổ hợp, điểm chuẩn, học phí) không?"
+        }
+      ],
+      "fallback": {
+        "text": "Hiện chưa có thông tin giới thiệu ngành {entity}. Bạn muốn tôi trả về đề án tuyển sinh chính thức không?"
+      },
+      "suggestions": [
+        "Cơ hội việc làm",
+        "Điểm chuẩn",
+        "Học phí"
+      ]
+    },
+    {
+      "intent": "ask_career_opportunity",
+      "responses": [
+        {
+          "text": "Sinh viên ngành {entity} sau khi tốt nghiệp có thể làm: {value}."
+        },
+        {
+          "text": "Cơ hội nghề nghiệp của {entity}: {value}. Bạn có muốn tôi hiển thị điểm chuẩn hoặc học phí không?"
+        }
+      ],
+      "fallback": {
+        "text": "Tôi chưa có thông tin cơ hội việc làm cho ngành {entity}. Bạn muốn tôi tìm theo ngành gần nhất không?"
+      },
+      "suggestions": [
+        "Giới thiệu ngành học",
+        "Điểm chuẩn",
+        "Phương thức xét tuyển"
+      ]
+    },
+    {
+      "intent": "ask_floor_score",
+      "responses": [
+        {
+          "text": "Ngưỡng nhận hồ sơ {year} cho {entity} theo {method}/{combo} là {value}. Nguồn: {source}."
+        },
+        {
+          "text": "Điểm sàn {year} của {entity}: {value}. Tổ hợp áp dụng: {combo}."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có điểm sàn {year} cho {entity}. Tôi có thể trả mức năm trước hoặc thông báo khi trường công bố."
+      },
+      "suggestions": [
+        "Điểm chuẩn {year}",
+        "Chỉ tiêu {year}",
+        "Phương thức áp dụng"
+      ]
+    },
+    {
+      "intent": "ask_quota_by_method",
+      "responses": [
+        {
+          "text": "Chỉ tiêu {year} của {entity} theo {method}: {value}."
+        },
+        {
+          "text": "Kế hoạch tuyển sinh {entity} qua {method}: {value}. Xem đề án: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có chỉ tiêu {year} cho {entity} theo {method}."
+      },
+      "suggestions": [
+        "Phương thức xét tuyển",
+        "Điểm sàn",
+        "Điểm chuẩn"
+      ]
+    },
+    {
+      "intent": "ask_schedule_by_method",
+      "responses": [
+        {
+          "text": "{method}: {step} từ {start_date} đến {end_date}. Link: {url}."
+        },
+        {
+          "text": "Mốc thời gian {method} ({year}): {step} ({start_date} → {end_date})."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có lịch {method} ({year}). Bạn muốn tôi trả lịch tổng không?"
+      },
+      "suggestions": [
+        "Kênh đăng ký",
+        "Điều kiện hồ sơ"
+      ]
+    },
+    {
+      "intent": "ask_apply_channel",
+      "responses": [
+        {
+          "text": "Đăng ký {method} qua {channel}: {url}. Hướng dẫn: {note}."
+        },
+        {
+          "text": "Kênh nộp {method}: {channel}. Bạn cần tôi mở link không?"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa rõ kênh nộp {method}. Tôi có thể đưa trang tuyển sinh tổng."
+      },
+      "suggestions": [
+        "Mốc thời gian",
+        "Điều kiện phương thức"
+      ]
+    },
+    {
+      "intent": "ask_method_condition",
+      "responses": [
+        {
+          "text": "Điều kiện {method}: {value}. Minh chứng: {proof}. Hạn: {deadline}."
+        },
+        {
+          "text": "Để xét theo {method} cần: {value}. Xem chi tiết: {url}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có điều kiện chi tiết cho {method}. Bạn muốn xem quy định chung không?"
+      },
+      "suggestions": [
+        "Quy đổi chứng chỉ",
+        "Lịch nộp",
+        "Kênh đăng ký"
+      ]
+    },
+    {
+      "intent": "ask_certificate_mapping",
+      "responses": [
+        {
+          "text": "{cert} mức {level} → {mapping}. Hiệu lực: {valid}. Ghi chú: {note}."
+        },
+        {
+          "text": "Quy đổi/ưu tiên: {cert} ({level}) = {mapping}. Nguồn: {source}"
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có quy đổi cho {cert}. Tôi có thể trả quy định chung của Bộ."
+      },
+      "suggestions": [
+        "Điểm sàn",
+        "Điều kiện phương thức"
+      ]
+    },
+    {
+      "intent": "ask_fee_program",
+      "responses": [
+        {
+          "text": "Học phí {program} {year}: {fee} ({unit}). Ghi chú: {note}."
+        },
+        {
+          "text": "Mức học phí {program}: {fee}/{unit}. Áp dụng năm {year}."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có học phí {program} ({year}). Bạn muốn xem mức năm gần nhất không?"
+      },
+      "suggestions": [
+        "Học bổng",
+        "Chương trình CLC",
+        "CDIO"
+      ]
+    },
+    {
+      "intent": "ask_scholarship_internal",
+      "responses": [
+        {
+          "text": "{scholarship}: đối tượng {target}, giá trị {amount}. Hạn: {deadline}. Tham khảo: {url}."
+        },
+        {
+          "text": "Học bổng nội bộ: {scholarship} – {amount}. Điều kiện: {target}."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có chi tiết học bổng nội bộ bạn hỏi. Tôi có thể liệt kê các học bổng hiện có."
+      },
+      "suggestions": [
+        "Học phí",
+        "Điều kiện học bổng"
+      ]
+    },
+    {
+      "intent": "ask_scholarship_international",
+      "responses": [
+        {
+          "text": "{scholarship} ({country}): bậc {degree}, giá trị {amount}, yêu cầu NN {lang_req}, hạn {deadline}. Link: {url}."
+        },
+        {
+          "text": "Chương trình {scholarship}: {amount}. Thời gian đào tạo: {duration}. Hạn: {deadline}."
+        }
+      ],
+      "fallback": {
+        "text": "Chưa có dữ liệu học bổng quốc tế này. Tôi có thể đưa chương trình tương tự."
+      },
+      "suggestions": [
+        "Yêu cầu ngoại ngữ",
+        "Hạn nộp",
+        "Giá trị học bổng"
+      ]
+    }
+  ]
+}

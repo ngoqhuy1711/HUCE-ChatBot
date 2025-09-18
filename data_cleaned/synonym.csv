@@ -1,0 +1,35 @@
+entity,canonical,alias
+MAJOR,Công nghệ thông tin,CNTT
+MAJOR,Công nghệ thông tin,IT
+MAJOR,Khoa học máy tính,KHMT
+MAJOR,Kỹ thuật xây dựng,Xây dựng
+MAJOR,Kỹ thuật xây dựng,XD
+MAJOR,Kỹ thuật xây dựng,XDDD&CN
+MAJOR,Kiến trúc,KT
+MAJOR,Kinh tế xây dựng,KTXD
+MAJOR,Quản lý xây dựng,QLXD
+MAJOR,Kỹ thuật môi trường,MT
+MAJOR,Kỹ thuật môi trường,Môi trường
+SERVICE,Ký túc xá,KTX
+FEE,Học phí,HP
+FEE,Học phí,Tiền học
+PROGRAM,Chất lượng cao,CLC
+PROGRAM,CDIO,Chuẩn CDIO
+PROGRAM,Vừa học vừa làm,VHVL
+METHOD,Xét học bạ,HB
+METHOD,Xét học bạ,Học bạ
+METHOD,Thi THPT,THPT
+METHOD,Đánh giá năng lực,ĐGNL
+METHOD,TSA,Thi TSA
+METHOD,V-SAT,VSAT
+SCHOLARSHIP,Học bổng khuyến khích học tập,HB KKHT
+SCHOLARSHIP,Học bổng khuyến khích học tập,Khuyến khích
+SCHOLARSHIP,Học bổng Đỗ Quốc Sam,Đỗ Quốc Sam
+SCHOLARSHIP,Học bổng CSC,CSC
+SCHOLARSHIP,Học bổng Merali,Merali
+SCHOLARSHIP,Học bổng Kumho Asiana,Kumho
+SCHOLARSHIP,Học bổng Chevening,Chevening
+SCHOLARSHIP,Học bổng DAAD,DAAD
+SCHOLARSHIP,Học bổng MEXT,MEXT
+SCHOLARSHIP,Học bổng Erasmus+,Erasmus
+SCHOLARSHIP,Học bổng Fulbright,Fulbright
