@@ -1,13 +1,22 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from nlu.pipeline import NLPPipeline
 
 app = FastAPI()
+
+pipeline = NLPPipeline()
+
+
+class ChatRequest(BaseModel):
+	message: str
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+	return {"message": "OK"}
 
 
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.post("/chat")
+async def chat(req: ChatRequest):
+	analysis = pipeline.analyze(req.message)
+	return analysis
