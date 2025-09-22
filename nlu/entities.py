@@ -7,14 +7,60 @@ from .preprocess import normalize_text
 
 try:
     from underthesea import ner as uts_ner  # type: ignore
-except Exception:
+except ImportError:
     uts_ner = None  # type: ignore
+
+
+def _load_entity_patterns(path: str) -> List[Tuple[str, str]]:
+    patterns: List[Tuple[str, str]] = []
+    if not os.path.isfile(path):
+        return patterns
+    with open(path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        for item in data:
+            label = (item.get('label') or '').strip()
+            pat = normalize_text(item.get('pattern') or '')
+            if label and pat:
+                patterns.append((label, pat))
+    return patterns
+
+
+def _extract_by_ner(text: str) -> List[Dict[str, Any]]:
+    if uts_ner is None:
+        return []
+    try:
+        ner_result = uts_ner(text)  # list of (word, tag)
+    except (ValueError, RuntimeError):
+        return []
+    found: List[Dict[str, Any]] = []
+    buffer_tokens: List[str] = []
+    current_tag: str = ''
+
+    def flush():
+        nonlocal buffer_tokens, current_tag, found
+        if buffer_tokens and current_tag:
+            span = " ".join(buffer_tokens)
+            found.append({"label": current_tag, "text": span, "source": "ner"})
+        buffer_tokens = []
+        current_tag = ''
+
+    for token, tag in ner_result:
+        if tag.startswith('B-'):
+            flush()
+            current_tag = tag[2:]
+            buffer_tokens = [token]
+        elif tag.startswith('I-') and current_tag == tag[2:]:
+            buffer_tokens.append(token)
+        else:
+            flush()
+    flush()
+    return found
 
 
 class EntityExtractor:
     def __init__(self, data_dir: str, patterns_path: str) -> None:
         self.data_dir = data_dir
-        self.entity_patterns: List[Tuple[str, str]] = self._load_entity_patterns(patterns_path)
+        self.entity_patterns: List[Tuple[str, str]] = _load_entity_patterns(patterns_path)
         self.dict_phrases: List[Tuple[str, str]] = self._load_dictionary_phrases()
         self.entity_label_alias: Dict[str, str] = {
             'NAM_TUYEN_SINH': 'NAM_HOC',
@@ -26,18 +72,6 @@ class EntityExtractor:
         }
 
     # ---------- Loaders ----------
-    def _load_entity_patterns(self, path: str) -> List[Tuple[str, str]]:
-        patterns: List[Tuple[str, str]] = []
-        if not os.path.isfile(path):
-            return patterns
-        with open(path, 'r', encoding='utf-8') as f:
-            data = json.load(f)
-            for item in data:
-                label = (item.get('label') or '').strip()
-                pat = normalize_text(item.get('pattern') or '')
-                if label and pat:
-                    patterns.append((label, pat))
-        return patterns
 
     def _load_dictionary_phrases(self) -> List[Tuple[str, str]]:
         phrases: List[Tuple[str, str]] = []
@@ -74,10 +108,10 @@ class EntityExtractor:
         add_file(os.path.join(base, 'standard_score.csv'), lambda r, p: (
             p.append(('MA_NGANH',
                       normalize_text(r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh') or ''))) if (
-                        r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh')) else None,
+                    r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh')) else None,
             p.append(
                 ('TEN_NGANH', normalize_text(r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh') or ''))) if (
-                        r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh')) else None,
+                    r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh')) else None,
             [p.append(('TO_HOP_MON', normalize_text(th))) for th in
              (normalize_text(r.get('Mã tổ hợp') or r.get('to_hop') or '')).split(',') if th],
             [p.append(('NAM_HOC', normalize_text(k))) for k in r.keys() if k and normalize_text(k).startswith('năm')],
@@ -167,43 +201,12 @@ class EntityExtractor:
                 found.append({"label": label, "text": phrase, "source": "dictionary"})
         return found
 
-    def _extract_by_ner(self, text: str) -> List[Dict[str, Any]]:
-        if uts_ner is None:
-            return []
-        try:
-            ner_result = uts_ner(text)  # list of (word, tag)
-        except Exception:
-            return []
-        found: List[Dict[str, Any]] = []
-        buffer_tokens: List[str] = []
-        current_tag: str = ''
-
-        def flush():
-            nonlocal buffer_tokens, current_tag, found
-            if buffer_tokens and current_tag:
-                span = " ".join(buffer_tokens)
-                found.append({"label": current_tag, "text": span, "source": "ner"})
-            buffer_tokens = []
-            current_tag = ''
-
-        for token, tag in ner_result:
-            if tag.startswith('B-'):
-                flush()
-                current_tag = tag[2:]
-                buffer_tokens = [token]
-            elif tag.startswith('I-') and current_tag == tag[2:]:
-                buffer_tokens.append(token)
-            else:
-                flush()
-        flush()
-        return found
-
     def extract(self, text: str) -> List[Dict[str, Any]]:
         norm = normalize_text(text)
         results: List[Dict[str, Any]] = []
         results.extend(self._extract_by_patterns(norm))
         results.extend(self._extract_by_dictionaries(norm))
-        results.extend(self._extract_by_ner(text))
+        results.extend(_extract_by_ner(text))
         seen: Set[Tuple[str, str]] = set()
         dedup: List[Dict[str, Any]] = []
         for ent in results:

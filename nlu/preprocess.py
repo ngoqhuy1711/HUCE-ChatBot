@@ -5,8 +5,8 @@ import unicodedata
 
 try:
     from underthesea import word_tokenize
-except Exception:  # fallback if underthesea is not installed
-    def word_tokenize(text: str, format=None):
+except ImportError:  # fallback if underthesea is not installed
+    def word_tokenize(text: str):
         return text.split()
 
 # Minimal Vietnamese stopword set (extendable)
@@ -30,9 +30,9 @@ def normalize_text(text) -> str:
 def tokenize_and_map(text: str, synonym_map: Dict[str, str]) -> List[str]:
     norm = normalize_text(text)
     try:
-        raw = word_tokenize(norm, format='text')
+        raw = word_tokenize(norm)
         toks = raw.split()
-    except Exception:
+    except (ValueError, TypeError, AttributeError):
         toks = norm.split()
     mapped = [synonym_map.get(tok, tok) for tok in toks]
     filtered = [t for t in mapped if t not in VI_STOPWORDS]

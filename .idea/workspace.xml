@@ -4,17 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="222876ef-4ee2-4a6a-af7d-3976b5d2f3b0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/backend.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_09_2025_3_57_CH_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_18_09_2025_3_57_CH__Changes_.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+    <list default="true" id="222876ef-4ee2-4a6a-af7d-3976b5d2f3b0" name="Changes" comment="Refactor code for improved readability; adjust formatting in csv_service, entities, intent, main, pipeline, and preprocess files">
+      <change beforePath="$PROJECT_DIR$/nlu/entities.py" beforeDir="false" afterPath="$PROJECT_DIR$/nlu/entities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nlu/intent.py" beforeDir="false" afterPath="$PROJECT_DIR$/nlu/intent.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/nlu/pipeline.py" beforeDir="false" afterPath="$PROJECT_DIR$/nlu/pipeline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nlu/preprocess.py" beforeDir="false" afterPath="$PROJECT_DIR$/nlu/preprocess.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +160,7 @@
       <workItem from="1758270667334" duration="95000" />
       <workItem from="1758389778179" duration="606000" />
       <workItem from="1758522744485" duration="2379000" />
-      <workItem from="1758525222464" duration="413000" />
+      <workItem from="1758525222464" duration="859000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial project structure and configuration files for backend development">
       <option name="closed" value="true" />
@@ -176,7 +170,39 @@
       <option name="project" value="LOCAL" />
       <updated>1758185334230</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Update README.md and requirements.txt; enhance documentation and add necessary dependencies">
+      <option name="closed" value="true" />
+      <created>1758525736447</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1758525736447</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Refactor NLP pipeline; modularize entity extraction and intent detection, enhance text normalization, and improve error handling for optional dependencies">
+      <option name="closed" value="true" />
+      <created>1758525756738</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1758525756738</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Add domain endpoints for majors, scores, tuition, and scholarships; implement csv service for data handling">
+      <option name="closed" value="true" />
+      <created>1758525766171</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1758525766171</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Refactor code for improved readability; adjust formatting in csv_service, entities, intent, main, pipeline, and preprocess files">
+      <option name="closed" value="true" />
+      <created>1758525872295</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1758525872295</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,10 +238,14 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add initial project structure and configuration files for backend development" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add initial project structure and configuration files for backend development" />
+    <MESSAGE value="Update README.md and requirements.txt; enhance documentation and add necessary dependencies" />
+    <MESSAGE value="Refactor NLP pipeline; modularize entity extraction and intent detection, enhance text normalization, and improve error handling for optional dependencies" />
+    <MESSAGE value="Add domain endpoints for majors, scores, tuition, and scholarships; implement csv service for data handling" />
+    <MESSAGE value="Refactor code for improved readability; adjust formatting in csv_service, entities, intent, main, pipeline, and preprocess files" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor code for improved readability; adjust formatting in csv_service, entities, intent, main, pipeline, and preprocess files" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/backend$demo.coverage" NAME="demo Coverage Results" MODIFIED="1758178751654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nlu" />
-    <SUITE FILE_PATH="coverage/backend$backend.coverage" NAME="backend Coverage Results" MODIFIED="1758525223146" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/backend$backend.coverage" NAME="backend Coverage Results" MODIFIED="1758525938619" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

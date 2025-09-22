@@ -4,30 +4,30 @@ from typing import List, Dict, Tuple, Any, Set
 
 try:
     from underthesea import word_tokenize
-except Exception:  # fallback if underthesea is not installed
-    def word_tokenize(text: str, format=None):
+except ImportError:  # fallback if underthesea is not installed
+    def word_tokenize(text: str):
         return text.split()
 
 # Try optional NER from underthesea
 try:
     from underthesea import ner as uts_ner  # type: ignore
-except Exception:
+except ImportError:
     uts_ner = None  # type: ignore
 
 # New modular imports
 try:
     from .preprocess import normalize_text as ext_normalize_text
     from .preprocess import tokenize_and_map as ext_tokenize_and_map
-except Exception:
+except ImportError:
     ext_normalize_text = None  # type: ignore
     ext_tokenize_and_map = None  # type: ignore
 try:
     from .intent import IntentDetector
-except Exception:
+except ImportError:
     IntentDetector = None  # type: ignore
 try:
     from .entities import EntityExtractor
-except Exception:
+except ImportError:
     EntityExtractor = None  # type: ignore
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -43,11 +43,37 @@ VI_STOPWORDS: Set[str] = {
 }
 
 
+def _normalize_text(text) -> str:
+    if ext_normalize_text is not None:
+        return ext_normalize_text(text)
+    # fallback minimal
+    if not isinstance(text, str):
+        text = str(text) if text is not None else ""
+    return text.lower().strip()
+
+
+def _load_synonyms(path: str) -> Dict[str, str]:
+    mapping: Dict[str, str] = {}
+    if not os.path.isfile(path):
+        return mapping
+    with open(path, newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        _ = next(reader, None)
+        for row in reader:
+            if len(row) < 2:
+                continue
+            src = _normalize_text(row[0])
+            dst = _normalize_text(row[1])
+            if src and dst:
+                mapping[src] = dst
+    return mapping
+
+
 class NLPPipeline:
     def __init__(self, data_dir: str = DATA_DIR, intent_threshold: float = DEFAULT_INTENT_THRESHOLD) -> None:
         self.data_dir = data_dir
         self.intent_threshold = intent_threshold
-        self.syn_map = self._load_synonyms(os.path.join(data_dir, 'synonym.csv'))
+        self.syn_map = _load_synonyms(os.path.join(data_dir, 'synonym.csv'))
         self.intent_samples = self._load_intent_samples(os.path.join(data_dir, 'intent.csv'))
         # Keyword backoff rules for intent detection (substring match on normalized text)
         self.intent_keyword_backoff: Dict[str, str] = {
@@ -79,21 +105,6 @@ class NLPPipeline:
                                                  os.path.join(data_dir, 'entity.json')) if EntityExtractor else None
 
     # ---------- Loaders ----------
-    def _load_synonyms(self, path: str) -> Dict[str, str]:
-        mapping: Dict[str, str] = {}
-        if not os.path.isfile(path):
-            return mapping
-        with open(path, newline='', encoding='utf-8') as f:
-            reader = csv.reader(f)
-            _ = next(reader, None)
-            for row in reader:
-                if len(row) < 2:
-                    continue
-                src = self._normalize_text(row[0])
-                dst = self._normalize_text(row[1])
-                if src and dst:
-                    mapping[src] = dst
-        return mapping
 
     def _load_intent_samples(self, path: str) -> Dict[str, List[List[str]]]:
         intent_to_samples: Dict[str, List[List[str]]] = {}
@@ -102,7 +113,7 @@ class NLPPipeline:
         with open(path, newline='', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for r in reader:
-                utt = self._normalize_text(r.get('utterance') or '')
+                utt = _normalize_text(r.get('utterance') or '')
                 intent = (r.get('intent') or '').strip()
                 if not utt or not intent:
                     continue
@@ -114,20 +125,13 @@ class NLPPipeline:
         return intent_to_samples
 
     # ---------- Preprocess (delegate normalization) ----------
-    def _normalize_text(self, text) -> str:
-        if ext_normalize_text is not None:
-            return ext_normalize_text(text)
-        # fallback minimal
-        if not isinstance(text, str):
-            text = str(text) if text is not None else ""
-        return text.lower().strip()
 
     # ---------- Intent ----------
     def detect_intent(self, text: str) -> Tuple[str, float]:
         if self._intent_detector is None:
             return 'fallback', 0.0
-        normalize_for_kw = ext_normalize_text or self._normalize_text
-        return self._intent_detector.detect(text, self.syn_map, self._normalize_text, normalize_for_kw)
+        ext_normalize_text() or _normalize_text
+        return self._intent_detector.detect(text, self.syn_map, _normalize_text)
 
     # ---------- Entities ----------
     def extract_entities(self, text: str) -> List[Dict[str, Any]]:
