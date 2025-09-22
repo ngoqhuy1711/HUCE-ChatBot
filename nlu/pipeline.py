@@ -1,11 +1,6 @@
 import csv
-import json
-import math
 import os
-import re
 from typing import List, Dict, Tuple, Any, Set
-
-import unicodedata
 
 try:
     from underthesea import word_tokenize
@@ -78,8 +73,10 @@ class NLPPipeline:
             "vsat": "hoi_phuong_thuc",
         }
         # Modular detectors
-        self._intent_detector = IntentDetector(self.intent_samples, self.intent_keyword_backoff, self.intent_threshold) if IntentDetector else None
-        self._entity_extractor = EntityExtractor(self.data_dir, os.path.join(data_dir, 'entity.json')) if EntityExtractor else None
+        self._intent_detector = IntentDetector(self.intent_samples, self.intent_keyword_backoff,
+                                               self.intent_threshold) if IntentDetector else None
+        self._entity_extractor = EntityExtractor(self.data_dir,
+                                                 os.path.join(data_dir, 'entity.json')) if EntityExtractor else None
 
     # ---------- Loaders ----------
     def _load_synonyms(self, path: str) -> Dict[str, str]:

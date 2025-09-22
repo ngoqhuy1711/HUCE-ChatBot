@@ -1,6 +1,7 @@
 import re
-import unicodedata
 from typing import Dict, List, Set
+
+import unicodedata
 
 try:
     from underthesea import word_tokenize

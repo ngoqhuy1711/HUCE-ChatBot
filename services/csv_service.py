@@ -47,7 +47,8 @@ def find_standard_score(major: Optional[str] = None, year: Optional[str] = None)
             if year and year not in k_l:
                 continue
             if v and str(v).strip():
-                results.append({'ma_nganh': ma, 'ten_nganh': ten, 'nam': k, 'diem_chuan': v, 'to_hop': r.get('Mã tổ hợp') or r.get('to_hop')})
+                results.append({'ma_nganh': ma, 'ten_nganh': ten, 'nam': k, 'diem_chuan': v,
+                                'to_hop': r.get('Mã tổ hợp') or r.get('to_hop')})
     return results
 
 

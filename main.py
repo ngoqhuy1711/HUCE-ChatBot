@@ -1,6 +1,7 @@
+from typing import Optional
+
 from fastapi import FastAPI, Query
 from pydantic import BaseModel
-from typing import Optional
 
 from nlu.pipeline import NLPPipeline
 from services import csv_service as csvs
@@ -34,9 +35,9 @@ async def get_majors(q: Optional[str] = Query(None, description="Tên ngành ho�
 
 @app.get("/diem")
 async def get_scores(
-    type: str = Query("chuan", description="chuan | san"),
-    major: Optional[str] = Query(None, description="Tên/mã ngành"),
-    year: Optional[str] = Query(None, description="Năm, ví dụ 2025")
+        type: str = Query("chuan", description="chuan | san"),
+        major: Optional[str] = Query(None, description="Tên/mã ngành"),
+        year: Optional[str] = Query(None, description="Năm, ví dụ 2025")
 ):
     if type == "san":
         return {"items": csvs.find_floor_score(major, year)}

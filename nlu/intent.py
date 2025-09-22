@@ -7,7 +7,8 @@ DEFAULT_INTENT_THRESHOLD = 0.35
 
 
 class IntentDetector:
-    def __init__(self, intent_samples: Dict[str, List[List[str]]], intent_keyword_backoff: Dict[str, str], threshold: float = DEFAULT_INTENT_THRESHOLD) -> None:
+    def __init__(self, intent_samples: Dict[str, List[List[str]]], intent_keyword_backoff: Dict[str, str],
+                 threshold: float = DEFAULT_INTENT_THRESHOLD) -> None:
         self.intent_samples = intent_samples
         self.intent_keyword_backoff = intent_keyword_backoff
         self.threshold = threshold

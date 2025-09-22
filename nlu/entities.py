@@ -41,6 +41,7 @@ class EntityExtractor:
 
     def _load_dictionary_phrases(self) -> List[Tuple[str, str]]:
         phrases: List[Tuple[str, str]] = []
+
         # major_intro.csv
         def add_file(path: str, handler):
             if os.path.isfile(path):
@@ -48,28 +49,37 @@ class EntityExtractor:
                     reader = csv.DictReader(f)
                     for r in reader:
                         handler(r, phrases)
+
         base = self.data_dir
         add_file(os.path.join(base, 'major_intro.csv'), lambda r, p: (
             p.append(('MA_NGANH', normalize_text(r.get('ma_nganh') or ''))) if r.get('ma_nganh') else None,
             p.append(('TEN_NGANH', normalize_text(r.get('ten_nganh') or ''))) if r.get('ten_nganh') else None,
         ))
         add_file(os.path.join(base, 'admission_methods.csv'), lambda r, p: (
-            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get('phuong_thuc') else None,
+            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get(
+                'phuong_thuc') else None,
         ))
         add_file(os.path.join(base, 'method_condition.csv'), lambda r, p: (
-            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get('phuong_thuc') else None,
+            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get(
+                'phuong_thuc') else None,
             p.append(('DIEU_KIEN_XET_TUYEN', normalize_text(r.get('dieu_kien') or ''))) if r.get('dieu_kien') else None,
         ))
         add_file(os.path.join(base, 'tuition.csv'), lambda r, p: (
-            p.append(('HOC_PHI_CATEGORY', normalize_text(r.get('chuong_trinh') or ''))) if r.get('chuong_trinh') else None,
+            p.append(('HOC_PHI_CATEGORY', normalize_text(r.get('chuong_trinh') or ''))) if r.get(
+                'chuong_trinh') else None,
         ))
         add_file(os.path.join(base, 'scholarships_huce.csv'), lambda r, p: (
             p.append(('HOC_BONG_TEN', normalize_text(r.get('ten') or ''))) if r.get('ten') else None,
         ))
         add_file(os.path.join(base, 'standard_score.csv'), lambda r, p: (
-            p.append(('MA_NGANH', normalize_text(r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh') or ''))) if (r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh')) else None,
-            p.append(('TEN_NGANH', normalize_text(r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh') or ''))) if (r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh')) else None,
-            [p.append(('TO_HOP_MON', normalize_text(th))) for th in (normalize_text(r.get('Mã tổ hợp') or r.get('to_hop') or '')).split(',') if th],
+            p.append(('MA_NGANH',
+                      normalize_text(r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh') or ''))) if (
+                        r.get('Mã xét tuyển') or r.get('ma_xet_tuyen') or r.get('ma_nganh')) else None,
+            p.append(
+                ('TEN_NGANH', normalize_text(r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh') or ''))) if (
+                        r.get('Ngành/ Chuyên ngành tuyển sinh') or r.get('ten_nganh')) else None,
+            [p.append(('TO_HOP_MON', normalize_text(th))) for th in
+             (normalize_text(r.get('Mã tổ hợp') or r.get('to_hop') or '')).split(',') if th],
             [p.append(('NAM_HOC', normalize_text(k))) for k in r.keys() if k and normalize_text(k).startswith('năm')],
         ))
         add_file(os.path.join(base, 'floor_score.csv'), lambda r, p: (
@@ -83,14 +93,16 @@ class EntityExtractor:
             p.append(('NAM_HOC', normalize_text(r.get('nam') or ''))) if r.get('nam') else None,
         ))
         add_file(os.path.join(base, 'admissions_schedule.csv'), lambda r, p: (
-            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get('phuong_thuc') else None,
+            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get(
+                'phuong_thuc') else None,
             p.append(('THOI_GIAN_BUOC', normalize_text(r.get('buoc') or ''))) if r.get('buoc') else None,
             p.append(('URL', normalize_text(r.get('url') or ''))) if r.get('url') else None,
         ))
         add_file(os.path.join(base, 'apply_channel.csv'), lambda r, p: (
             p.append(('KENH_NOP_HO_SO', normalize_text(r.get('kenh') or ''))) if r.get('kenh') else None,
             p.append(('URL', normalize_text(r.get('url') or ''))) if r.get('url') else None,
-            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get('phuong_thuc') else None,
+            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get(
+                'phuong_thuc') else None,
         ))
         add_file(os.path.join(base, 'contact.csv'), lambda r, p: (
             p.append(('DON_VI_LIEN_HE', normalize_text(r.get('co_quan') or ''))) if r.get('co_quan') else None,
@@ -111,13 +123,15 @@ class EntityExtractor:
         ))
         add_file(os.path.join(base, 'admission_conditions.csv'), lambda r, p: (
             p.append(('NAM_HOC', normalize_text(r.get('nam') or ''))) if r.get('nam') else None,
-            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get('phuong_thuc') else None,
+            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get(
+                'phuong_thuc') else None,
             p.append(('DIEU_KIEN_XET_TUYEN', normalize_text(r.get('dieu_kien') or ''))) if r.get('dieu_kien') else None,
         ))
         add_file(os.path.join(base, 'admission_method_for_each_major.csv'), lambda r, p: (
             p.append(('MA_NGANH', normalize_text(r.get('ma_nganh') or ''))) if r.get('ma_nganh') else None,
             p.append(('TEN_NGANH', normalize_text(r.get('ten_nganh') or ''))) if r.get('ten_nganh') else None,
-            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get('phuong_thuc') else None,
+            p.append(('PHUONG_THUC_XET_TUYEN', normalize_text(r.get('phuong_thuc') or ''))) if r.get(
+                'phuong_thuc') else None,
         ))
         # remove empty phrases and duplicates
         cleaned: List[Tuple[str, str]] = []
