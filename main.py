@@ -35,11 +35,11 @@ async def get_majors(q: Optional[str] = Query(None, description="Tên ngành ho�
 
 @app.get("/diem")
 async def get_scores(
-        type: str = Query("chuan", description="chuan | san"),
+        score_type: str = Query("chuan", description="chuan | san"),
         major: Optional[str] = Query(None, description="Tên/mã ngành"),
         year: Optional[str] = Query(None, description="Năm, ví dụ 2025")
 ):
-    if type == "san":
+    if score_type == "san":
         return {"items": csvs.find_floor_score(major, year)}
     return {"items": csvs.find_standard_score(major, year)}
 
