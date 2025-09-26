@@ -46,9 +46,3 @@ uvicorn backend.main:app --reload
 - Intent: TF‑IDF cosine so với trọng tâm (centroid) của từng intent; ngưỡng mặc định: 0.35; ưu tiên intent bắt đầu
   `hoi_`
 - Entity: match theo chuỗi con từ `entity.json`
-
-## Lộ trình tiếp theo
-
-- Viết hàm trả lời dựa trên CSV cho từng intent (điểm chuẩn, điểm sàn, chỉ tiêu, học phí, phương thức)
-- Mở rộng rule entity và bộ kiểm thử
-- Frontend chat (React + Tailwind) và biểu đồ thống kê
