@@ -1,4 +1,4 @@
-# Chatbot Tư vấn Tuyển sinh HUCE (Dự án cá nhân)
+# Chatbot Tư vấn Tuyển sinh HUCE
 
 Backend FastAPI + NLP tiếng Việt (Underthesea) để trả lời câu hỏi tuyển sinh HUCE từ dữ liệu CSV đã chuẩn hóa.
 
