@@ -29,18 +29,6 @@ pip install -r requirements.txt
 uvicorn backend.main:app --reload
 ```
 
-## API
-
-- Health: `GET /` → `{ "message": "OK" }`
-- Chat: `POST /chat`
-    - Body ví dụ:
-      ```json
-      { "message": "Điểm chuẩn ngành Kỹ thuật xây dựng 2025" }
-      ```
-    - Response ví dụ:
-      ```json
-      { "intent": "hoi_diem_chuan", "score": 0.45, "entities": [{"label":"MA_NGANH","text":"7580201"}] }
-      ```
 
 ## Dữ liệu
 
