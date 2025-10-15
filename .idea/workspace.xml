@@ -136,8 +136,8 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.demo" />
       <item itemvalue="FastAPI.backend" />
+      <item itemvalue="Python.demo" />
     </list>
     <recent_temporary>
       <list>
