@@ -83,12 +83,25 @@ def _extract_by_ner(text: str) -> List[Dict[str, Any]]:
         current_tag = ''
 
     # Xử lý kết quả NER theo format BIO
-    for token, tag in ner_result:
-        if tag.startswith('B-'):  # Begin
+    # Underthesea NER trả về list of tuples: [(word, pos_tag, ner_tag, chunk), ...]
+    # hoặc [(word, ner_tag), ...] tùy version
+    for item in ner_result:
+        # Unpack an toàn: lấy phần tử đầu (word) và cuối (NER tag)
+        if isinstance(item, (list, tuple)):
+            if len(item) >= 2:
+                token = item[0]  # Word là phần tử đầu
+                tag = item[-1]   # NER tag thường là phần tử cuối
+            else:
+                continue  # Skip nếu format không đúng
+        else:
+            continue  # Skip nếu không phải tuple/list
+        
+        # Xử lý theo BIO format
+        if isinstance(tag, str) and tag.startswith('B-'):  # Begin
             flush()
             current_tag = tag[2:]
             buffer_tokens = [token]
-        elif tag.startswith('I-') and current_tag == tag[2:]:  # Inside
+        elif isinstance(tag, str) and tag.startswith('I-') and current_tag == tag[2:]:  # Inside
             buffer_tokens.append(token)
         else:  # Other
             flush()

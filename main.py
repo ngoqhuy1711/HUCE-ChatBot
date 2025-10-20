@@ -38,10 +38,14 @@ Cấu trúc:
    POST /chat/context  → Quản lý context (get/set/reset)
 
 3. DATA (Tra cứu dữ liệu)
-   GET  /nganh   → Danh sách ngành học
-   GET  /diem    → Điểm chuẩn/điểm sàn
-   GET  /hocphi  → Học phí
-   GET  /hocbong → Học bổng
+   GET  /nganh      → Danh sách ngành học
+   GET  /diem       → Điểm chuẩn/điểm sàn
+   GET  /hocphi     → Học phí
+   GET  /hocbong    → Học bổng
+   GET  /chi-tieu   → Chỉ tiêu tuyển sinh
+   GET  /lich       → Lịch tuyển sinh
+   GET  /kenh-nop   → Kênh nộp hồ sơ
+   GET  /dieu-kien  → Điều kiện xét tuyển
 
 4. HELPER (Hỗ trợ)
    POST /goiy → Gợi ý ngành theo điểm số
@@ -65,19 +69,55 @@ TRƯỚC: Tách 5 router files riêng (chat, majors, scores, tuition, scholarshi
 SAU: Gộp tất cả vào main.py
 
 LÝ DO:
-- Dự án nhỏ (9 endpoints) → 1 file dễ quản lý hơn
+- Dự án nhỏ (13 endpoints) → 1 file dễ quản lý hơn
 - Debug nhanh hơn (không nhảy qua nhiều file)
 - Đơn giản hơn cho 1 người maintain
 - Vẫn rõ ràng với comment đầy đủ
 """
 
+import logging
+import os
 from typing import Optional, Dict, Any
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Import services
 from services.nlp_service import get_nlp_service
 from services import csv_service as csvs
+from config import DATA_DIR
+
+
+# ============================================================================
+# PHẦN 0: CẤU HÌNH LOGGING
+# ============================================================================
+# Logging giúp:
+# 1. Debug khi có lỗi (xem log file để biết lỗi ở đâu)
+# 2. Theo dõi user queries (phân tích câu hỏi thực tế để cải thiện NLP)
+# 3. Monitor performance (xem API nào chậm)
+# 4. Viết báo cáo (thống kê số lượng queries, intent phổ biến)
+
+# Tạo thư mục logs nếu chưa có
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+if not os.path.exists(log_dir):
+    os.makedirs(log_dir)
+
+# Cấu hình logging với 2 handlers:
+# 1. FileHandler: Ghi log vào file logs/chatbot.log (để xem sau)
+# 2. StreamHandler: In log ra console (để debug realtime)
+logging.basicConfig(
+    level=logging.INFO,  # Log level: DEBUG < INFO < WARNING < ERROR < CRITICAL
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        # Handler 1: Ghi vào file
+        logging.FileHandler(os.path.join(log_dir, 'chatbot.log'), encoding='utf-8'),
+        # Handler 2: In ra console
+        logging.StreamHandler()
+    ]
+)
+
+# Tạo logger cho module này
+logger = logging.getLogger(__name__)
 
 
 # ============================================================================
@@ -90,10 +130,47 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# ============================================================================
+# PHẦN 1.5: CẤU HÌNH CORS (Cross-Origin Resource Sharing)
+# ============================================================================
+# CORS cho phép frontend (React/Vite chạy ở port khác) gọi API backend
+# Ví dụ: Frontend chạy ở http://localhost:3000, backend ở http://localhost:8000
+# Nếu không config CORS → Browser sẽ block request (CORS policy error)
+
+app.add_middleware(
+    CORSMiddleware,
+    # allow_origins: Danh sách domain được phép gọi API
+    allow_origins=[
+        "http://localhost:3000",    # React Create React App
+        "http://localhost:5173",    # Vite (default port)
+        "http://localhost:5174",    # Vite (alternative port)
+        "http://127.0.0.1:3000",    # Alternative localhost
+        "http://127.0.0.1:5173",    # Alternative localhost
+        # Khi deploy production, thêm domain thật vào đây:
+        # "https://your-frontend-domain.com"
+    ],
+    # allow_credentials: Cho phép gửi cookies/credentials
+    allow_credentials=True,
+    # allow_methods: Cho phép tất cả HTTP methods (GET, POST, PUT, DELETE, etc.)
+    allow_methods=["*"],
+    # allow_headers: Cho phép tất cả headers (Content-Type, Authorization, etc.)
+    allow_headers=["*"],
+)
+
+# Log khi server khởi động
+logger.info("="*60)
+logger.info("🚀 HUCE Chatbot API Server Starting...")
+logger.info("="*60)
+logger.info("📝 CORS enabled for: localhost:3000, localhost:5173")
+logger.info("📂 Data directory: %s", DATA_DIR)
+logger.info("📊 Swagger docs: http://localhost:8000/docs")
+logger.info("="*60)
+
 # Lấy NLP service singleton
 # Service này chứa: pipeline (NLP), context_store (lưu context)
 # Được khởi tạo MỘT LẦN khi app start, dùng chung cho mọi request
 nlp = get_nlp_service()
+logger.info("✅ NLP Service initialized successfully")
 
 
 # ============================================================================
@@ -195,8 +272,26 @@ async def chat(req: ChatRequest):
             ]
         }
     """
-    analysis = nlp.analyze_message(req.message)
-    return analysis
+    try:
+        # Log request để theo dõi
+        logger.info(f"📨 /chat - Message: {req.message[:100]}")  # Chỉ log 100 ký tự đầu
+        
+        # Phân tích NLP
+        analysis = nlp.analyze_message(req.message)
+        
+        # Log kết quả
+        logger.info(f"✅ /chat - Intent: {analysis['intent']} (score: {analysis['score']:.2f})")
+        
+        return analysis
+    
+    except Exception as e:
+        # Log lỗi với stack trace đầy đủ
+        logger.error(f"❌ Error in /chat: {str(e)}", exc_info=True)
+        # Trả về lỗi 500 với message rõ ràng
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
 
 
 @app.post("/chat/context")
@@ -321,35 +416,63 @@ async def advanced_chat(req: AdvancedChatRequest):
         → Dùng context → Biết "còn" = tiếp tục hỏi về Kiến trúc
         → Trả điểm sàn Kiến trúc
     """
-    message = req.message
-    session_id = req.session_id or "default"
-    use_context = req.use_context if req.use_context is not None else True
+    try:
+        # Log request với session_id để tracking user
+        logger.info(f"💬 /chat/advanced - Session: {req.session_id} - Message: {req.message[:100]}")
+        
+        message = req.message
+        session_id = req.session_id or "default"
+        use_context = req.use_context if req.use_context is not None else True
+        
+        # Bước 1: Lấy context hiện tại (nếu dùng context)
+        current_context = nlp.get_context(session_id) if use_context else {}
+        
+        # Bước 2: Xử lý message (NLP + dữ liệu + fallback)
+        result = nlp.handle_message(message, current_context)
+        analysis = result["analysis"]
+        response = result["response"]
+        
+        # Log kết quả phân tích
+        logger.info(
+            f"✅ /chat/advanced - Intent: {analysis['intent']} "
+            f"(score: {analysis['score']:.2f}) - "
+            f"Response type: {response.get('type', 'unknown')}"
+        )
+        
+        # Bước 3: Cập nhật context
+        # Thêm câu hỏi-trả lời vào lịch sử
+        new_context = nlp.append_history(session_id, {
+            "message": message,
+            "intent": analysis["intent"],
+            "response": response
+        })
+        # Lưu intent và entities của câu hiện tại
+        new_context["last_intent"] = analysis["intent"]
+        new_context["last_entities"] = analysis["entities"]
+        
+        # Bước 4: Trả về kết quả đầy đủ
+        return {
+            "analysis": analysis,
+            "response": response,
+            "context": new_context
+        }
     
-    # Bước 1: Lấy context hiện tại (nếu dùng context)
-    current_context = nlp.get_context(session_id) if use_context else {}
-    
-    # Bước 2: Xử lý message (NLP + dữ liệu + fallback)
-    result = nlp.handle_message(message, current_context)
-    analysis = result["analysis"]
-    response = result["response"]
-    
-    # Bước 3: Cập nhật context
-    # Thêm câu hỏi-trả lời vào lịch sử
-    new_context = nlp.append_history(session_id, {
-        "message": message,
-        "intent": analysis["intent"],
-        "response": response
-    })
-    # Lưu intent và entities của câu hiện tại
-    new_context["last_intent"] = analysis["intent"]
-    new_context["last_entities"] = analysis["entities"]
-    
-    # Bước 4: Trả về kết quả đầy đủ
-    return {
-        "analysis": analysis,
-        "response": response,
-        "context": new_context
-    }
+    except Exception as e:
+        # Log lỗi chi tiết để debug
+        logger.error(
+            f"❌ Error in /chat/advanced - Session: {req.session_id} - "
+            f"Message: {req.message[:100]} - Error: {str(e)}",
+            exc_info=True
+        )
+        # Trả về lỗi 500 với fallback response thân thiện
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": "Internal server error",
+                "message": "Xin lỗi, có lỗi xảy ra khi xử lý câu hỏi của bạn. Vui lòng thử lại.",
+                "debug_info": str(e) if logger.level == logging.DEBUG else None
+            }
+        )
 
 
 # ============================================================================
@@ -505,8 +628,266 @@ async def get_scholarships(q: Optional[str] = Query(None, description="Tên họ
     Example 2 - Tìm học bổng khuyến khích:
         GET /hocbong?q=khuyến khích
     """
-    items = csvs.list_scholarships(q)
-    return {"items": items}
+    try:
+        logger.info(f"📚 /hocbong - Query: {q}")
+        items = csvs.list_scholarships(q)
+        logger.info(f"✅ /hocbong - Found {len(items)} scholarships")
+        return {"items": items}
+    except Exception as e:
+        logger.error(f"❌ Error in /hocbong: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/chi-tieu")
+async def get_quota(
+    major: Optional[str] = Query(None, description="Tên hoặc mã ngành"),
+    year: Optional[str] = Query(None, description="Năm học")
+):
+    """
+    Tra cứu chỉ tiêu tuyển sinh.
+    
+    Chỉ tiêu = số lượng sinh viên dự kiến tuyển cho mỗi ngành
+    
+    Tham số:
+    - major: Tên hoặc mã ngành (optional)
+    - year: Năm học (optional)
+    
+    Returns:
+        {
+            "items": [
+                {
+                    "ma_nganh": str,
+                    "ten_nganh": str,
+                    "nam": str,
+                    "chi_tieu": int,        # Số lượng dự kiến tuyển
+                    "phuong_thuc": str,     # Phương thức xét tuyển
+                    "ghi_chu": str
+                },
+                ...
+            ]
+        }
+        
+    Example 1 - Chỉ tiêu tất cả ngành năm 2025:
+        GET /chi-tieu?year=2025
+        
+    Example 2 - Chỉ tiêu ngành Kiến trúc:
+        GET /chi-tieu?major=kiến trúc
+        
+    Example 3 - Chỉ tiêu ngành Kiến trúc năm 2025:
+        GET /chi-tieu?major=kiến trúc&year=2025
+    """
+    try:
+        logger.info(f"📊 /chi-tieu - Major: {major}, Year: {year}")
+        
+        # Đọc file CSV chỉ tiêu
+        rows = csvs._read_csv(os.path.join(DATA_DIR, 'admission_quota.csv'))
+        
+        # Nếu có filter, lọc dữ liệu
+        if major or year:
+            results = []
+            for r in rows:
+                ma = (r.get('ma_nganh') or '').lower()
+                ten = (r.get('ten_nganh') or '').lower()
+                nam = (r.get('nam') or '').lower()
+                
+                # Lọc theo ngành nếu có
+                if major and major.lower() not in ma and major.lower() not in ten:
+                    continue
+                # Lọc theo năm nếu có
+                if year and year not in nam:
+                    continue
+                    
+                results.append(r)
+            
+            logger.info(f"✅ /chi-tieu - Found {len(results)} records")
+            return {"items": results}
+        
+        # Nếu không filter, trả tất cả
+        logger.info(f"✅ /chi-tieu - Returning all {len(rows)} records")
+        return {"items": rows}
+    
+    except Exception as e:
+        logger.error(f"❌ Error in /chi-tieu: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/lich")
+async def get_schedule(
+    phuong_thuc: Optional[str] = Query(None, description="Phương thức xét tuyển")
+):
+    """
+    Tra cứu lịch tuyển sinh (thời gian, các bước, deadline).
+    
+    Tham số:
+    - phuong_thuc: Phương thức xét tuyển (optional)
+        Ví dụ: "THPT", "Học bạ", "TSA", "ĐGNL", "Tuyển thẳng"
+    
+    Returns:
+        {
+            "items": [
+                {
+                    "phuong_thuc": str,     # Phương thức xét tuyển
+                    "buoc": str,            # Bước trong quy trình
+                    "bat_dau": str,         # Ngày bắt đầu
+                    "ket_thuc": str,        # Ngày kết thúc/deadline
+                    "mo_ta": str,           # Mô tả công việc cần làm
+                    "url": str              # Link hướng dẫn chi tiết
+                },
+                ...
+            ]
+        }
+        
+    Example 1 - Lịch tất cả phương thức:
+        GET /lich
+        
+    Example 2 - Lịch xét tuyển THPT:
+        GET /lich?phuong_thuc=THPT
+        
+    Example 3 - Lịch xét học bạ:
+        GET /lich?phuong_thuc=học bạ
+    """
+    try:
+        logger.info(f"📅 /lich - Phuong thuc: {phuong_thuc}")
+        
+        # Đọc file CSV lịch tuyển sinh
+        rows = csvs._read_csv(os.path.join(DATA_DIR, 'admissions_schedule.csv'))
+        
+        # Lọc theo phương thức nếu có
+        if phuong_thuc:
+            rows = [
+                r for r in rows 
+                if phuong_thuc.lower() in (r.get('phuong_thuc') or '').lower()
+            ]
+        
+        logger.info(f"✅ /lich - Found {len(rows)} schedule entries")
+        return {"items": rows}
+    
+    except Exception as e:
+        logger.error(f"❌ Error in /lich: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/kenh-nop")
+async def get_apply_channel(
+    phuong_thuc: Optional[str] = Query(None, description="Phương thức xét tuyển")
+):
+    """
+    Tra cứu kênh nộp hồ sơ (online, offline, qua bưu điện).
+    
+    Tham số:
+    - phuong_thuc: Phương thức xét tuyển (optional)
+    
+    Returns:
+        {
+            "items": [
+                {
+                    "kenh": str,            # Tên kênh (Website, Bưu điện, Trực tiếp)
+                    "phuong_thuc": str,     # Phương thức xét tuyển áp dụng
+                    "url": str,             # Link website nộp hồ sơ
+                    "dia_chi": str,         # Địa chỉ nộp trực tiếp
+                    "huong_dan": str        # Hướng dẫn chi tiết
+                },
+                ...
+            ]
+        }
+        
+    Example 1 - Tất cả kênh nộp:
+        GET /kenh-nop
+        
+    Example 2 - Kênh nộp cho THPT:
+        GET /kenh-nop?phuong_thuc=THPT
+        
+    Ghi chú:
+    - Mỗi phương thức có thể có nhiều kênh nộp
+    - Website thường nhanh và tiện nhất
+    - Nộp trực tiếp phù hợp nếu cần tư vấn trực tiếp
+    """
+    try:
+        logger.info(f"📮 /kenh-nop - Phuong thuc: {phuong_thuc}")
+        
+        # Đọc file CSV kênh nộp hồ sơ
+        rows = csvs._read_csv(os.path.join(DATA_DIR, 'apply_channel.csv'))
+        
+        # Lọc theo phương thức nếu có
+        if phuong_thuc:
+            rows = [
+                r for r in rows 
+                if phuong_thuc.lower() in (r.get('phuong_thuc') or '').lower()
+            ]
+        
+        logger.info(f"✅ /kenh-nop - Found {len(rows)} channels")
+        return {"items": rows}
+    
+    except Exception as e:
+        logger.error(f"❌ Error in /kenh-nop: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+
+@app.get("/dieu-kien")
+async def get_conditions(
+    phuong_thuc: Optional[str] = Query(None, description="Phương thức xét tuyển"),
+    year: Optional[str] = Query(None, description="Năm học")
+):
+    """
+    Tra cứu điều kiện xét tuyển cho từng phương thức.
+    
+    Tham số:
+    - phuong_thuc: Phương thức xét tuyển (optional)
+    - year: Năm học (optional)
+    
+    Returns:
+        {
+            "items": [
+                {
+                    "phuong_thuc": str,     # Phương thức xét tuyển
+                    "nam": str,             # Năm áp dụng
+                    "dieu_kien": str,       # Điều kiện cần đáp ứng
+                    "loai_dieu_kien": str,  # Loại: bắt buộc/ưu tiên/bổ sung
+                    "chi_tiet": str,        # Giải thích chi tiết
+                    "vi_du": str            # Ví dụ minh họa
+                },
+                ...
+            ]
+        }
+        
+    Example 1 - Tất cả điều kiện năm 2025:
+        GET /dieu-kien?year=2025
+        
+    Example 2 - Điều kiện xét tuyển thẳng:
+        GET /dieu-kien?phuong_thuc=tuyển thẳng
+        
+    Example 3 - Điều kiện học bạ năm 2025:
+        GET /dieu-kien?phuong_thuc=học bạ&year=2025
+        
+    Ghi chú:
+    - Mỗi phương thức có điều kiện riêng
+    - Điều kiện có thể thay đổi theo năm
+    - Cần đọc kỹ để đảm bảo đủ điều kiện
+    """
+    try:
+        logger.info(f"📋 /dieu-kien - Phuong thuc: {phuong_thuc}, Year: {year}")
+        
+        # Đọc file CSV điều kiện xét tuyển
+        rows = csvs._read_csv(os.path.join(DATA_DIR, 'admission_conditions.csv'))
+        
+        # Lọc theo phương thức và năm nếu có
+        if phuong_thuc:
+            rows = [
+                r for r in rows 
+                if phuong_thuc.lower() in (r.get('phuong_thuc') or '').lower()
+            ]
+        if year:
+            rows = [
+                r for r in rows 
+                if year in (r.get('nam') or '')
+            ]
+        
+        logger.info(f"✅ /dieu-kien - Found {len(rows)} conditions")
+        return {"items": rows}
+    
+    except Exception as e:
+        logger.error(f"❌ Error in /dieu-kien: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 
 # ============================================================================
@@ -564,23 +945,75 @@ async def suggest_majors(req: Dict[str, Any]):
             "message": "Tìm thấy 5 ngành có điểm chuẩn <= 25.5"
         }
     """
-    score = req.get("score")
-    score_type = req.get("score_type", "chuan")
-    year = req.get("year")
+    try:
+        # Log request
+        logger.info(f"🎯 /goiy - Score: {req.get('score')}, Type: {req.get('score_type', 'chuan')}, Year: {req.get('year')}")
+        
+        score = req.get("score")
+        score_type = req.get("score_type", "chuan")
+        year = req.get("year", "2025")
+        
+        # Validate score
+        if not score:
+            raise HTTPException(
+                status_code=400,
+                detail="Missing required parameter: score"
+            )
+        
+        # Convert score to float
+        try:
+            score_float = float(score)
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid score value. Must be a number."
+            )
+        
+        # Chuẩn bị request_data theo format mà csv_service expect
+        # Function suggest_majors_by_score() expect Dict với keys:
+        # - diem_thpt, diem_tsa, diem_dgnl (cho điểm các loại)
+        # - chung_chi (cho chứng chỉ)
+        # - nam (cho năm học)
+        request_data = {
+            'nam': year
+        }
+        
+        # Tùy score_type, set vào key tương ứng
+        if score_type == "san":
+            # Điểm sàn không có trong suggest function hiện tại
+            # Cần dùng logic riêng hoặc fallback sang điểm chuẩn
+            request_data['diem_thpt'] = score_float
+            logger.warning(f"⚠️ score_type='san' not fully supported yet, using 'chuan' logic")
+        else:
+            # Mặc định dùng điểm THPT để so sánh điểm chuẩn
+            request_data['diem_thpt'] = score_float
+        
+        # Gọi service để tìm ngành phù hợp
+        items = csvs.suggest_majors_by_score(request_data)
+        
+        # Tạo message thông báo
+        if items:
+            message = f"Tìm thấy {len(items)} ngành có điểm {score_type} phù hợp với điểm {score}"
+            logger.info(f"✅ /goiy - Found {len(items)} majors")
+        else:
+            message = f"Không tìm thấy ngành có điểm {score_type} phù hợp với điểm {score}"
+            logger.info(f"⚠️ /goiy - No majors found")
+        
+        return {
+            "items": items,
+            "message": message
+        }
     
-    # Gọi service để tìm ngành phù hợp
-    items = csvs.suggest_majors_by_score(score, score_type, year)
-    
-    # Tạo message thông báo
-    if items:
-        message = f"Tìm thấy {len(items)} ngành có điểm {score_type} phù hợp với điểm {score}"
-    else:
-        message = f"Không tìm thấy ngành có điểm {score_type} phù hợp với điểm {score}"
-    
-    return {
-        "items": items,
-        "message": message
-    }
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        # Log và trả về lỗi 500
+        logger.error(f"❌ Error in /goiy: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal server error: {str(e)}"
+        )
 
 
 # ============================================================================

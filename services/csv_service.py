@@ -7,11 +7,6 @@ Module này là "kho dữ liệu" của chatbot, chịu trách nhiệm:
 2. Filter/search dữ liệu theo tiêu chí
 3. Cung cấp API đơn giản cho các service khác
 
-KHÔNG làm:
-- KHÔNG xử lý NLP (intent, entity)
-- KHÔNG quản lý context hội thoại
-- KHÔNG biết về HTTP request/response
-
 ==== CẤU TRÚC DỮ LIỆU CSV ====
 1. **major_intro.csv**: Thông tin ngành học
    - ma_nganh, ten_nganh, mo_ta
