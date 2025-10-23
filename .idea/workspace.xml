@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="222876ef-4ee2-4a6a-af7d-3976b5d2f3b0" name="Changes" comment="Đơn giản hóa backend: gộp routers và services&#10;&#10;- Gộp 5 routers vào main.py&#10;- Gộp 3 services thành nlp_service.py  &#10;- Xóa code thừa và imports phức tạp&#10;- Thêm comment tiếng Việt đầy đủ&#10;- Viết lại README.md&#10;- Giảm từ 16 xuống 10 files Python">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/backend.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/backend.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gitignore.txt" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gitignore.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/nlu/entities.py" beforeDir="false" afterPath="$PROJECT_DIR$/nlu/entities.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/csv_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/csv_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/services/nlp_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/nlp_service.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,6 +173,10 @@
       <workItem from="1760690820739" duration="371000" />
       <workItem from="1760691347298" duration="494000" />
       <workItem from="1760942506066" duration="1575000" />
+      <workItem from="1760944983234" duration="100000" />
+      <workItem from="1760991277583" duration="1717000" />
+      <workItem from="1761070942094" duration="476000" />
+      <workItem from="1761207595619" duration="62000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial project structure and configuration files for backend development">
       <option name="closed" value="true" />
@@ -288,6 +289,6 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/backend$demo.coverage" NAME="demo Coverage Results" MODIFIED="1758178751654" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/nlu" />
-    <SUITE FILE_PATH="coverage/backend$backend.coverage" NAME="backend Coverage Results" MODIFIED="1760943016565" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/backend$backend.coverage" NAME="backend Coverage Results" MODIFIED="1761071333097" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

@@ -373,7 +373,7 @@ async def advanced_chat(req: AdvancedChatRequest):
     └──────────────────────────────────────────┘
                     ↓
     ┌──────────────────────────────────────────┐
-    │ 3. Cập nhật context với câu hỏi mới     │
+    │ 3. Cập nhật context với câu hỏi mới      │
     │    - Thêm vào lịch sử                    │
     │    - Lưu last_intent, last_entities      │
     └──────────────────────────────────────────┘

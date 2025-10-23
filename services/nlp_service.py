@@ -15,7 +15,7 @@ File này gộp 3 services cũ thành 1:
 │  ├── pipeline: NLPPipeline (intent + entity)        │
 │  ├── context_store: ContextStore (lưu context)      │
 │  ├── intent_threshold: float (ngưỡng confidence)    │
-│  │                                                   │
+│  │                                                  │
 │  ├── analyze_message()   → Chỉ NLP                  │
 │  ├── handle_message()    → NLP + dữ liệu + fallback │
 │  ├── get_context()       → Lấy context              │
