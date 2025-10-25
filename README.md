@@ -13,26 +13,41 @@ Chatbot hỗ trợ học sinh và phụ huynh tra cứu thông tin tuyển sinh:
 
 ## 🚀 Cài đặt & Chạy
 
-### 1. Cài đặt dependencies
+### 1. Cài đặt uv
+
+```bash
+# Windows
+pip install uv
+
+# macOS/Linux  
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**🚀 Tại sao dùng uv?**
+- ⚡ **Cực nhanh**: Nhanh hơn pip 10-100x (viết bằng Rust)
+- 🤖 **Tự động**: Tự động cập nhật pyproject.toml, không cần chỉnh file thủ công
+- 🔒 **Nhất quán**: Lock file đảm bảo team dùng cùng version dependencies
+- 💾 **Tiết kiệm**: Cache toàn cục, không duplicate packages giữa các projects
+- 🎯 **Thông minh**: Tự động resolve dependency conflicts
+
+
+### 2. Cài đặt dependencies
 
 ```bash
 cd backend
-pip install -r requirements.txt
+uv sync
 ```
 
-### 2. Chạy server
+### 3. Chạy server
 
 ```bash
-# Từ thư mục gốc
-uvicorn backend.main:app --reload
-
-# Hoặc từ trong thư mục backend
-uvicorn main:app --reload
+# Từ thư mục backend
+uv run uvicorn main:app --reload
 ```
 
 Server chạy tại: http://localhost:8000
 
-### 3. Xem API docs
+### 4. Xem API docs
 
 Swagger UI: http://localhost:8000/docs
 
@@ -141,7 +156,7 @@ CONTEXT_HISTORY_LIMIT = 10        # Lưu 10 câu hội thoại
 ## 🧪 Testing
 
 ```bash
-pytest test_backend.py -v
+uv run pytest test_backend.py -v
 ```
 
 ## 📊 Dữ liệu CSV
@@ -257,14 +272,15 @@ async def get_schedule():
 
 1. **Context in-memory**: Hiện tại context lưu trong RAM, mất khi restart. Production nên dùng Redis.
 2. **CSV caching**: Tự động reload khi file CSV thay đổi (check mtime).
-3. **Underthesea**: Cần download model lần đầu: `python -m underthesea download-fasttext-model`
+3. **Underthesea**: Cần download model lần đầu: `uv run python -m underthesea download-fasttext-model`
 4. **Encoding**: Tất cả CSV phải UTF-8 encoding.
 
 ## 👨‍💻 Development
 
 ### Chạy với hot reload
 ```bash
-uvicorn backend.main:app --reload --log-level debug
+cd backend
+uv run uvicorn main:app --reload --log-level debug
 ```
 
 ### Test một endpoint
@@ -275,16 +291,12 @@ curl -X POST http://localhost:8000/chat \
 ```
 
 ### Debug NLP
-```python
-from services.nlp_service import get_nlp_service
-
-nlp = get_nlp_service()
-result = nlp.analyze_message("Điểm chuẩn ngành Kiến trúc")
-print(result)
+```bash
+uv run python
 ```
-
-## 📞 Contact
-
-Đề tài: Chatbot Tư vấn Tuyển sinh HUCE  
-Trường: Đại học Xây dựng Hà Nội  
-Năm: 2024-2025
+```python
+>>> from services.nlp_service import get_nlp_service
+>>> nlp = get_nlp_service()
+>>> result = nlp.analyze_message("Điểm chuẩn ngành Kiến trúc")
+>>> print(result)
+```

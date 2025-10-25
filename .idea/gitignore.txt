@@ -6,5 +6,29 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+# Python
 __pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+
+# Virtual Environment (uv)
+.venv/
+
+# Logs
 /logs/chatbot.log
+logs/*.log
+*.log
+
+# Environment variables
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+
+# OS
+.DS_Store
+Thumbs.db
