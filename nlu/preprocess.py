@@ -17,24 +17,54 @@ import unicodedata
 try:
     from underthesea import word_tokenize
 except ImportError:  # fallback nếu không cài đặt được
+
     def word_tokenize(text: str):
         return text.split()
 
+
 # Từ dừng tiếng Việt (có thể mở rộng)
 VI_STOPWORDS: Set[str] = {
-    "là", "làm", "và", "hoặc", "nhưng", "thì", "lúc", "khi", "ở", "của",
-    "cho", "với", "đến", "tới", "từ", "có", "được", "nhé", "ạ", "à", "ư",
-    "mình", "bạn", "xin", "chào", "ơi", "giúp", "hỏi", "cho", "xem", "bao",
+    "là",
+    "làm",
+    "và",
+    "hoặc",
+    "nhưng",
+    "thì",
+    "lúc",
+    "khi",
+    "ở",
+    "của",
+    "cho",
+    "với",
+    "đến",
+    "tới",
+    "từ",
+    "có",
+    "được",
+    "nhé",
+    "ạ",
+    "à",
+    "ư",
+    "mình",
+    "bạn",
+    "xin",
+    "chào",
+    "ơi",
+    "giúp",
+    "hỏi",
+    "cho",
+    "xem",
+    "bao",
 }
 
 
 def normalize_text(text) -> str:
     """
     Chuẩn hóa văn bản tiếng Việt
-    
+
     Args:
         text: Văn bản cần chuẩn hóa
-        
+
     Returns:
         Văn bản đã được chuẩn hóa:
         - Lowercase
@@ -49,10 +79,14 @@ def normalize_text(text) -> str:
     text = text.lower().strip()
 
     # Chuẩn hóa Unicode (NFC - Canonical Composition)
-    text = unicodedata.normalize('NFC', text)
+    text = unicodedata.normalize("NFC", text)
 
     # Loại bỏ ký tự đặc biệt, giữ lại chữ cái, số, khoảng trắng và ký tự tiếng Việt
-    text = re.sub(r"[^\w\sáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ]", " ", text)
+    text = re.sub(
+        r"[^\w\sáàảãạăắằẳẵặâấầẩẫậéèẻẽẹêếềểễệíìỉĩịóòỏõọôốồổỗộơớờởỡợúùủũụưứừửữựýỳỷỹỵđ]",
+        " ",
+        text,
+    )
 
     # Chuẩn hóa khoảng trắng (nhiều space thành 1 space)
     text = re.sub(r"\s+", " ", text).strip()
@@ -63,11 +97,11 @@ def normalize_text(text) -> str:
 def tokenize_and_map(text: str, synonym_map: Dict[str, str]) -> List[str]:
     """
     Tách từ và mapping từ đồng nghĩa
-    
+
     Args:
         text: Văn bản cần xử lý
         synonym_map: Dict mapping từ đồng nghĩa -> từ chuẩn
-        
+
     Returns:
         List tokens đã được xử lý:
         - Chuẩn hóa văn bản

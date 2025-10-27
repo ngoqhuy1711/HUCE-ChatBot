@@ -20,10 +20,10 @@ DEFAULT_INTENT_THRESHOLD = 0.35
 def _compute_idf(samples: List[List[str]]) -> Dict[str, float]:
     """
     Tính IDF (Inverse Document Frequency) cho tất cả tokens
-    
+
     Args:
         samples: List các câu đã được tokenize
-        
+
     Returns:
         Dict mapping token -> IDF score
     """
@@ -46,10 +46,10 @@ def _compute_idf(samples: List[List[str]]) -> Dict[str, float]:
 def _tf(toks: List[str]) -> Dict[str, float]:
     """
     Tính TF (Term Frequency) cho một câu
-    
+
     Args:
         toks: List tokens của câu
-        
+
     Returns:
         Dict mapping token -> TF score (normalized)
     """
@@ -64,10 +64,10 @@ def _tf(toks: List[str]) -> Dict[str, float]:
 def _centroid(vecs: List[Dict[str, float]]) -> Dict[str, float]:
     """
     Tính centroid (trọng tâm) từ list các vector
-    
+
     Args:
         vecs: List các TF-IDF vectors
-        
+
     Returns:
         Centroid vector đã được normalize
     """
@@ -85,10 +85,10 @@ def _centroid(vecs: List[Dict[str, float]]) -> Dict[str, float]:
 def _cosine(a: Dict[str, float], b: Dict[str, float]) -> float:
     """
     Tính cosine similarity giữa 2 vectors
-    
+
     Args:
         a, b: Hai TF-IDF vectors
-        
+
     Returns:
         Cosine similarity score (0-1)
     """
@@ -107,7 +107,7 @@ def _cosine(a: Dict[str, float], b: Dict[str, float]) -> float:
 class IntentDetector:
     """
     Intent Detector sử dụng TF-IDF + Cosine Similarity
-    
+
     Quy trình:
     1. Precompute TF-IDF vectors và centroids cho mỗi intent
     2. Với câu hỏi mới: tính TF-IDF vector
@@ -115,11 +115,15 @@ class IntentDetector:
     4. Nếu không đạt ngưỡng: fallback bằng keyword matching
     """
 
-    def __init__(self, intent_samples: Dict[str, List[List[str]]], intent_keyword_backoff: Dict[str, str],
-                 threshold: float = DEFAULT_INTENT_THRESHOLD) -> None:
+    def __init__(
+        self,
+        intent_samples: Dict[str, List[List[str]]],
+        intent_keyword_backoff: Dict[str, str],
+        threshold: float = DEFAULT_INTENT_THRESHOLD,
+    ) -> None:
         """
         Khởi tạo Intent Detector
-        
+
         Args:
             intent_samples: Dict mapping intent -> list of tokenized samples
             intent_keyword_backoff: Dict mapping keyword -> intent (fallback)
@@ -139,10 +143,10 @@ class IntentDetector:
     def _tfidf_vec(self, toks: List[str]) -> Dict[str, float]:
         """
         Tính TF-IDF vector cho một câu
-        
+
         Args:
             toks: List tokens của câu
-            
+
         Returns:
             TF-IDF vector đã được normalize
         """
@@ -176,15 +180,17 @@ class IntentDetector:
         self.intent_centroids = centroids
 
     # ---------- Public API ----------
-    def detect(self, text: str, synonym_map: Dict[str, str], normalize_for_kw_fn) -> Tuple[str, float]:
+    def detect(
+        self, text: str, synonym_map: Dict[str, str], normalize_for_kw_fn
+    ) -> Tuple[str, float]:
         """
         Nhận diện intent của câu hỏi
-        
+
         Args:
             text: Câu hỏi từ người dùng
             synonym_map: Mapping từ đồng nghĩa
             normalize_for_kw_fn: Function chuẩn hóa văn bản cho keyword matching
-            
+
         Returns:
             Tuple (intent, confidence_score)
         """
@@ -193,10 +199,12 @@ class IntentDetector:
         q_vec = self._tfidf_vec(q_tokens)  # Tính TF-IDF vector
 
         # So sánh với tất cả centroids
-        best_intent = ''
+        best_intent = ""
         best_score = 0.0
         for intent, centroid in self.intent_centroids.items():
-            score = _cosine(q_vec, centroid) * 1.05  # Bonus cho intent bắt đầu bằng "hoi_"
+            score = (
+                _cosine(q_vec, centroid) * 1.05
+            )  # Bonus cho intent bắt đầu bằng "hoi_"
             if score > best_score:
                 best_score = score
                 best_intent = intent
@@ -212,4 +220,4 @@ class IntentDetector:
                 return mapped_intent, best_score
 
         # Nếu không match gì: trả về fallback
-        return 'fallback', best_score
+        return "fallback", best_score

@@ -10,8 +10,7 @@ from .nlp_service import get_nlp_service, NLPService
 from . import csv_service
 
 __all__ = [
-    'get_nlp_service',
-    'NLPService',
-    'csv_service',
+    "get_nlp_service",
+    "NLPService",
+    "csv_service",
 ]
-
