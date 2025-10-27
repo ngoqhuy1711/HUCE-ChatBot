@@ -1,302 +1,402 @@
-# Chatbot Tư vấn Tuyển sinh HUCE
+# API Backend - Chatbot Tư vấn Tuyển sinh HUCE
 
-API Backend cho Chatbot tư vấn tuyển sinh Đại học Xây dựng Hà Nội.
+API Backend cho hệ thống Chatbot tư vấn tuyển sinh Đại học Xây dựng Hà Nội.
 
-## 📋 Tổng quan
+## 🎯 Tổng quan
 
-Chatbot hỗ trợ học sinh và phụ huynh tra cứu thông tin tuyển sinh:
-- Ngành học, khối thi, tổ hợp môn
-- Điểm chuẩn, điểm sàn, chỉ tiêu
-- Học phí, học bổng
-- Phương thức xét tuyển
-- Gợi ý ngành theo điểm số
+Hệ thống cung cấp API để tra cứu thông tin tuyển sinh:
+- **Ngành học**: Danh sách ngành, mã ngành, khối thi, tổ hợp môn
+- **Điểm số**: Điểm chuẩn, điểm sàn theo năm và ngành
+- **Học phí & Học bổng**: Thông tin chi phí và các chương trình hỗ trợ
+- **Phương thức xét tuyển**: Điều kiện, lịch trình, kênh nộp hồ sơ
+- **Gợi ý thông minh**: Đề xuất ngành phù hợp theo điểm số
 
-## 🚀 Cài đặt & Chạy
+### Công nghệ sử dụng
+- **Framework**: FastAPI (Python 3.13+)
+- **NLP**: Underthesea (xử lý tiếng Việt)
+- **Phương pháp**: TF-IDF + Cosine Similarity cho intent detection
+- **Dữ liệu**: CSV files (dễ cập nhật, không cần database)
 
-### 1. Cài đặt uv
+---
 
+## 🚀 Hướng dẫn cài đặt
+
+### Bước 1: Cài đặt uv (package manager)
+
+**Windows:**
 ```bash
-# Windows
 pip install uv
+```
 
-# macOS/Linux  
+**macOS/Linux:**
+```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-**🚀 Tại sao dùng uv?**
-- ⚡ **Cực nhanh**: Nhanh hơn pip 10-100x (viết bằng Rust)
-- 🤖 **Tự động**: Tự động cập nhật pyproject.toml, không cần chỉnh file thủ công
-- 🔒 **Nhất quán**: Lock file đảm bảo team dùng cùng version dependencies
-- 💾 **Tiết kiệm**: Cache toàn cục, không duplicate packages giữa các projects
-- 🎯 **Thông minh**: Tự động resolve dependency conflicts
-
-
-### 2. Cài đặt dependencies
+### Bước 2: Cài dependencies
 
 ```bash
 cd backend
 uv sync
 ```
 
-### 3. Chạy server
+### Bước 3: (Tùy chọn) Cấu hình môi trường
 
 ```bash
-# Từ thư mục backend
+# Copy file mẫu
+cp env.example .env
+
+# Chỉnh sửa .env nếu cần thay đổi:
+# - CORS_ORIGINS: Địa chỉ frontend
+# - LOG_LEVEL: Mức độ log (DEBUG/INFO/WARNING)
+# - INTENT_THRESHOLD: Ngưỡng nhận diện intent (0-1)
+```
+
+### Bước 4: Chạy server
+
+```bash
 uv run uvicorn main:app --reload
 ```
 
-Server chạy tại: http://localhost:8000
+Server chạy tại: **http://localhost:8000**
 
-### 4. Xem API docs
+API Documentation: **http://localhost:8000/docs**
 
-Swagger UI: http://localhost:8000/docs
-
-## 📁 Cấu trúc code
-
-```
-backend/
-├── main.py                 # FastAPI app - TẤT CẢ endpoints
-├── config.py              # Cấu hình (constants, thresholds)
-├── services/
-│   ├── nlp_service.py     # NLP + Context management
-│   └── csv_service.py     # Xử lý dữ liệu CSV
-├── nlu/                   # NLP core
-│   ├── pipeline.py        # Điều phối NLP
-│   ├── intent.py          # Intent detection (TF-IDF)
-│   ├── entities.py        # Entity extraction
-│   └── preprocess.py      # Text normalization
-├── data/                  # Dữ liệu CSV
-│   ├── major_intro.csv
-│   ├── standard_score.csv
-│   ├── floor_score.csv
-│   ├── tuition.csv
-│   ├── scholarships_huce.csv
-│   ├── intent.csv
-│   ├── entity.json
-│   └── synonym.csv
-└── test_backend.py        # Unit tests
-```
+---
 
 ## 📡 API Endpoints
 
-### Health Check
+### 1. Kiểm tra hệ thống
 ```http
 GET /
 ```
+Kiểm tra server hoạt động
 
-### Chat
+### 2. Chat & NLP
+
+**Phân tích NLP đơn giản:**
 ```http
 POST /chat
-Body: {"message": "Điểm chuẩn ngành Kiến trúc"}
-→ Phân tích NLP đơn giản
+Content-Type: application/json
 
+{
+  "message": "Điểm chuẩn ngành Kiến trúc"
+}
+```
+
+**Chat đầy đủ (có context):**
+```http
 POST /chat/advanced
-Body: {
-  "message": "Còn điểm sàn?",
+Content-Type: application/json
+
+{
+  "message": "Còn điểm sàn thì sao?",
   "session_id": "user_123",
   "use_context": true
 }
-→ Chat đầy đủ với context
+```
 
+**Quản lý context:**
+```http
 POST /chat/context
-Body: {"action": "reset", "session_id": "user_123"}
-→ Quản lý context (get/set/reset)
-```
+Content-Type: application/json
 
-### Data
-```http
-GET /nganh?q=kiến trúc
-→ Tra cứu ngành học
-
-GET /diem?score_type=chuan&major=kiến trúc&year=2025
-→ Điểm chuẩn/sàn
-
-GET /hocphi?year=2025
-→ Học phí
-
-GET /hocbong?q=khuyến khích
-→ Học bổng
-```
-
-### Helper
-```http
-POST /goiy
-Body: {"score": 25.5, "score_type": "chuan", "year": "2025"}
-→ Gợi ý ngành theo điểm
-```
-
-## 🧠 NLP Pipeline
-
-### Intent Detection
-- Phương pháp: TF-IDF + Cosine Similarity
-- Dữ liệu: `data/intent.csv`
-- Threshold: 0.35 (config.py)
-
-### Entity Extraction
-- Phương pháp: Pattern + Dictionary + Underthesea NER
-- Dữ liệu: `data/entity.json`
-- Entities: TEN_NGANH, MA_NGANH, KHOI_THI, DIEM_SO, NAM_HOC, ...
-
-### Text Preprocessing
-1. Normalize Unicode (VN diacritics)
-2. Lowercase
-3. Remove special chars
-4. Tokenize (Underthesea)
-5. Map synonyms (`data/synonym.csv`)
-
-## 🔧 Cấu hình
-
-File `config.py`:
-```python
-DATA_DIR = "data"                 # Thư mục chứa CSV
-INTENT_THRESHOLD = 0.35           # Ngưỡng intent confidence
-CONTEXT_HISTORY_LIMIT = 10        # Lưu 10 câu hội thoại
-```
-
-## 🧪 Testing
-
-```bash
-uv run pytest test_backend.py -v
-```
-
-## 📊 Dữ liệu CSV
-
-| File | Mục đích |
-|------|----------|
-| `major_intro.csv` | Thông tin ngành học |
-| `standard_score.csv` | Điểm chuẩn (2023-2025) |
-| `floor_score.csv` | Điểm sàn theo phương thức |
-| `tuition.csv` | Học phí |
-| `scholarships_huce.csv` | Học bổng |
-| `intent.csv` | Training data cho intent detection |
-| `entity.json` | Dictionary cho entity extraction |
-| `synonym.csv` | Từ đồng nghĩa, viết tắt |
-
-## 💡 Luồng xử lý
-
-```
-User message → FastAPI endpoint
-     ↓
-NLPService.handle_message()
-     ├── NLPPipeline.analyze()
-     │   ├── Preprocess (normalize, tokenize)
-     │   ├── Intent detection (TF-IDF)
-     │   └── Entity extraction (pattern + NER)
-     ├── Check confidence score
-     │   ├── High → csv_service.handle_intent_query()
-     │   └── Low  → csv_service.handle_fallback_query()
-     └── Update context
-         ├── Append to conversation history
-         └── Save last_intent, last_entities
-              ↓
-         Response to user
-```
-
-## 🎯 Tính năng chính
-
-### 1. Context Management
-- Lưu 10 câu hội thoại gần nhất
-- Hiểu câu hỏi tiếp theo dựa vào ngữ cảnh
-- Reset context để bắt đầu hội thoại mới
-
-### 2. Fallback thông minh
-- Khi không nhận diện được intent rõ ràng
-- Tìm kiếm theo từ khóa đơn giản
-- Gợi ý cách hỏi rõ hơn
-
-### 3. CSV Caching
-- Cache dữ liệu CSV theo mtime
-- Tự động reload khi file thay đổi
-- Giảm 90% disk I/O
-
-### 4. Multi-session support
-- Mỗi user có session_id riêng
-- Context tách biệt giữa các session
-- Hỗ trợ nhiều user cùng lúc
-
-## 🛠 Thêm tính năng mới
-
-### 1. Thêm Intent mới
-
-**Bước 1**: Thêm vào `data/intent.csv`
-```csv
-intent_name,sample_query
-hoi_thoi_gian_xet_tuyen,khi nào xét tuyển
-hoi_thoi_gian_xet_tuyen,thời gian nộp hồ sơ
-```
-
-**Bước 2**: Xử lý trong `csv_service.handle_intent_query()`
-```python
-if intent == "hoi_thoi_gian_xet_tuyen":
-    data = _read_csv_cached(os.path.join(DATA_DIR, "admissions_schedule.csv"))
-    return {"type": "schedule", "data": data}
-```
-
-### 2. Thêm Entity mới
-
-Thêm vào `data/entity.json`:
-```json
 {
-  "THOI_GIAN": {
-    "patterns": ["\\d{1,2}/\\d{1,2}/\\d{4}"],
-    "keywords": ["deadline", "hạn cuối", "thời hạn"]
-  }
+  "action": "reset",           # get/set/reset
+  "session_id": "user_123"
 }
 ```
 
-### 3. Thêm Endpoint mới
+### 3. Tra cứu dữ liệu
 
-Thêm vào `main.py`:
-```python
-@app.get("/thoi-gian")
-async def get_schedule():
-    data = csvs.read_schedule()  # Thêm hàm này vào csv_service
-    return {"items": data}
+| Endpoint | Mô tả | Query params |
+|----------|-------|--------------|
+| `GET /nganh` | Danh sách ngành | `?q=kiến trúc` |
+| `GET /diem` | Điểm chuẩn/sàn | `?score_type=chuan&major=kiến trúc&year=2025` |
+| `GET /hocphi` | Học phí | `?year=2025` |
+| `GET /hocbong` | Học bổng | `?q=khuyến khích` |
+| `GET /chi-tieu` | Chỉ tiêu tuyển sinh | `?major=kiến trúc&year=2025` |
+| `GET /lich` | Lịch tuyển sinh | `?phuong_thuc=THPT` |
+| `GET /kenh-nop` | Kênh nộp hồ sơ | `?phuong_thuc=THPT` |
+| `GET /dieu-kien` | Điều kiện xét tuyển | `?phuong_thuc=THPT&year=2025` |
+
+### 4. Gợi ý ngành
+
+```http
+POST /goiy
+Content-Type: application/json
+
+{
+  "score": 25.5,
+  "score_type": "chuan",       # chuan hoặc san
+  "year": "2025"
+}
 ```
 
-## 📈 Hiệu năng
+---
 
-- Response time: < 200ms (cached)
-- Memory: ~100MB (với tất cả CSV loaded)
-- Concurrent users: 50+ (FastAPI async)
+## 🧠 Kiến trúc NLP
 
-## 🚧 TODO
-
-- [ ] Thêm API điểm sàn theo chứng chỉ
-- [ ] Thêm API cơ hội nghề nghiệp
-- [ ] Tích hợp Redis cho context (production)
-- [ ] Thêm logging
-- [ ] Deployment Docker
-
-## 📝 Lưu ý
-
-1. **Context in-memory**: Hiện tại context lưu trong RAM, mất khi restart. Production nên dùng Redis.
-2. **CSV caching**: Tự động reload khi file CSV thay đổi (check mtime).
-3. **Underthesea**: Cần download model lần đầu: `uv run python -m underthesea download-fasttext-model`
-4. **Encoding**: Tất cả CSV phải UTF-8 encoding.
-
-## 👨‍💻 Development
-
-### Chạy với hot reload
-```bash
-cd backend
-uv run uvicorn main:app --reload --log-level debug
+### Luồng xử lý
+```
+Câu hỏi người dùng
+    ↓
+[1] Tiền xử lý văn bản
+    - Chuẩn hóa Unicode (tiếng Việt)
+    - Lowercase, loại ký tự đặc biệt
+    - Tách từ (Underthesea)
+    - Map từ đồng nghĩa
+    ↓
+[2] Nhận diện Intent
+    - TF-IDF + Cosine Similarity
+    - Ngưỡng: 0.35 (config)
+    - Fallback nếu không đạt ngưỡng
+    ↓
+[3] Trích xuất Entity
+    - Pattern matching
+    - Dictionary lookup (CSV)
+    - NER (Underthesea)
+    ↓
+[4] Lấy dữ liệu từ CSV
+    - Dựa vào intent + entities
+    - Cache thông minh (mtime)
+    ↓
+[5] Cập nhật Context
+    - Lưu lịch sử 10 câu gần nhất
+    - Lưu intent + entities
+    ↓
+Trả về kết quả
 ```
 
-### Test một endpoint
+### Dữ liệu huấn luyện
+
+| File | Mục đích |
+|------|----------|
+| `intent.csv` | Mẫu câu cho intent detection |
+| `entity.json` | Pattern cho entity extraction |
+| `synonym.csv` | Từ đồng nghĩa, viết tắt |
+| `major_intro.csv` | Thông tin ngành học |
+| `standard_score.csv` | Điểm chuẩn 2023-2025 |
+| `floor_score.csv` | Điểm sàn theo phương thức |
+| `tuition.csv` | Học phí |
+| `scholarships_huce.csv` | Học bổng |
+
+---
+
+## 🔧 Cấu hình
+
+### Config từ Environment Variables
+
+Tạo file `.env` từ `env.example`:
+
 ```bash
+# NLP
+INTENT_THRESHOLD=0.35              # Ngưỡng nhận diện intent (0-1)
+CONTEXT_HISTORY_LIMIT=10           # Số câu lưu trong context
+
+# Server
+SERVER_HOST=0.0.0.0
+SERVER_PORT=8000
+DEBUG=false
+LOG_LEVEL=INFO                     # DEBUG/INFO/WARNING/ERROR
+
+# CORS (Frontend origins)
+CORS_ORIGINS=http://localhost:3000,http://localhost:8080
+
+# API
+MAX_RESULTS=100                    # Giới hạn kết quả trả về
+MAX_SUGGESTIONS=20                 # Giới hạn gợi ý ngành
+```
+
+### Config trong Code
+
+File `constants.py` chứa tất cả hằng số:
+- Intent names
+- Entity labels
+- Response types
+- Error messages
+- Validation rules
+
+---
+
+## 🧪 Testing
+
+### Chạy test suite
+
+```bash
+# Start server trước
+uv run uvicorn main:app --reload
+
+# Terminal khác: chạy tests
+uv run python test_api_comprehensive.py
+```
+
+### Test thủ công
+
+```bash
+# Test health check
+curl http://localhost:8000/
+
+# Test chat
 curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Điểm chuẩn ngành Kiến trúc"}'
+
+# Test với session
+curl -X POST http://localhost:8000/chat/advanced \
+  -H "Content-Type: application/json" \
+  -d '{
+    "message": "Còn điểm sàn?",
+    "session_id": "test_123",
+    "use_context": true
+  }'
 ```
 
-### Debug NLP
+---
+
+## 📂 Cấu trúc thư mục
+
+```
+backend/
+│
+├── 📄 Core
+│   ├── main.py              # FastAPI application, tất cả endpoints
+│   ├── config.py            # Cấu hình environment variables
+│   ├── constants.py         # Intent/Entity/Error constants
+│   └── models.py            # Pydantic request/response models
+│
+├── 📦 Services
+│   ├── services/
+│   │   ├── nlp_service.py   # NLP pipeline + Context management
+│   │   └── csv_service.py   # Xử lý dữ liệu CSV
+│   │
+│   └── nlu/                 # NLP core modules
+│       ├── pipeline.py      # Điều phối NLP
+│       ├── intent.py        # Intent detection (TF-IDF)
+│       ├── entities.py      # Entity extraction
+│       └── preprocess.py    # Tiền xử lý văn bản
+│
+├── 📊 Data
+│   └── data/                # Dữ liệu CSV (19 files)
+│       ├── intent.csv
+│       ├── entity.json
+│       ├── synonym.csv
+│       ├── major_intro.csv
+│       ├── standard_score.csv
+│       └── ...
+│
+└── 🛠 Support
+    ├── env.example          # Template environment variables
+    ├── test_api_comprehensive.py  # Test suite
+    ├── pyproject.toml       # Dependencies
+    └── README.md            # File này
+```
+
+---
+
+## 🎓 Tính năng nâng cao
+
+### 1. Context Management
+- Lưu 10 câu hội thoại gần nhất mỗi session
+- Hiểu câu hỏi tiếp theo dựa vào ngữ cảnh
+- Mỗi user có `session_id` riêng
+
+**Ví dụ:**
+```
+User: "Điểm chuẩn ngành Kiến trúc?"
+Bot: "25.5 điểm"
+User: "Còn điểm sàn?"         ← Bot hiểu "Kiến trúc" từ context
+Bot: "22.0 điểm"
+```
+
+### 2. Fallback thông minh
+- Khi không nhận diện được intent rõ ràng (score < 0.35)
+- Tự động tìm kiếm theo từ khóa
+- Gợi ý cách hỏi rõ hơn
+
+### 3. CSV Caching
+- Cache dữ liệu CSV theo modification time
+- Tự động reload khi file thay đổi
+- Giảm 90% I/O operations
+
+### 4. Response chuẩn hóa
+Tất cả endpoints trả về format nhất quán:
+```json
+{
+  "success": true,
+  "data": [...],
+  "count": 10,
+  "message": "Tìm thấy 10 kết quả"
+}
+```
+
+---
+
+## 📝 Lưu ý quan trọng
+
+### Cho Developer
+- **Python version**: Yêu cầu 3.13+
+- **Encoding**: Tất cả CSV phải UTF-8
+- **Context**: Lưu trong RAM, mất khi restart server
+- **Production**: Nên dùng Redis cho context store
+
+### Cho Frontend Developer
+- **CORS**: Đã config sẵn cho React (3000), Vite (5173), Reflex (8080)
+- **Response format**: Luôn check `response.success` trước khi xử lý data
+- **Session ID**: Generate unique ID cho mỗi user để lưu context
+- **Error handling**: 
+  - 400: Bad request
+  - 422: Validation error
+  - 500: Server error
+
+### Performance
+- **Response time**: < 200ms (với cache)
+- **Memory**: ~100MB (tất cả CSV loaded)
+- **Concurrent users**: 50+ (FastAPI async)
+
+---
+
+## 🐛 Troubleshooting
+
+### Server không start
 ```bash
-uv run python
+# Kiểm tra import
+uv run python -c "import main; print('OK')"
+
+# Xem logs
+cat logs/chatbot.log
 ```
-```python
->>> from services.nlp_service import get_nlp_service
->>> nlp = get_nlp_service()
->>> result = nlp.analyze_message("Điểm chuẩn ngành Kiến trúc")
->>> print(result)
+
+### CORS errors
+```bash
+# Thêm origin vào .env
+echo "CORS_ORIGINS=http://localhost:8080" >> .env
 ```
+
+### NLP không chính xác
+- Kiểm tra file `data/intent.csv` có đủ mẫu câu
+- Điều chỉnh `INTENT_THRESHOLD` trong .env
+- Thêm từ đồng nghĩa vào `data/synonym.csv`
+
+### Tests fail
+```bash
+# Đảm bảo server đang chạy
+curl http://localhost:8000/
+
+# Kiểm tra logs
+tail -f logs/chatbot.log
+```
+
+---
+
+## 📞 Hỗ trợ
+
+- **API Docs**: http://localhost:8000/docs
+- **Logs**: `backend/logs/chatbot.log`
+- **Test Suite**: `uv run python test_api_comprehensive.py`
+
+---
+
+**Phiên bản**: 1.0.0  
+**Ngày cập nhật**: 2025-10-27  
+**Trạng thái**: Production Ready ✅

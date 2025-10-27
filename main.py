@@ -80,12 +80,27 @@ import os
 from typing import Optional, Dict, Any
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
 # Import services
 from services.nlp_service import get_nlp_service
 from services import csv_service as csvs
-from config import DATA_DIR
+
+# Import config và constants
+from config import (
+    DATA_DIR, 
+    get_cors_origins, 
+    get_cors_allow_credentials,
+    get_log_level
+)
+from constants import Intent, ResponseType, Validation, ErrorMessage, SuccessMessage
+from models import (
+    ChatRequest, 
+    AdvancedChatRequest, 
+    ContextRequest, 
+    SuggestMajorsRequest,
+    create_success_response,
+    create_error_response
+)
 
 
 # ============================================================================
@@ -102,11 +117,15 @@ log_dir = os.path.join(os.path.dirname(__file__), 'logs')
 if not os.path.exists(log_dir):
     os.makedirs(log_dir)
 
+# Lấy log level từ environment
+log_level_str = get_log_level()
+log_level = getattr(logging, log_level_str, logging.INFO)
+
 # Cấu hình logging với 2 handlers:
 # 1. FileHandler: Ghi log vào file logs/chatbot.log (để xem sau)
 # 2. StreamHandler: In log ra console (để debug realtime)
 logging.basicConfig(
-    level=logging.INFO,  # Log level: DEBUG < INFO < WARNING < ERROR < CRITICAL
+    level=log_level,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
         # Handler 1: Ghi vào file
@@ -133,24 +152,20 @@ app = FastAPI(
 # ============================================================================
 # PHẦN 1.5: CẤU HÌNH CORS (Cross-Origin Resource Sharing)
 # ============================================================================
-# CORS cho phép frontend (React/Vite chạy ở port khác) gọi API backend
+# CORS cho phép frontend (React/Vite/Reflex chạy ở port khác) gọi API backend
 # Ví dụ: Frontend chạy ở http://localhost:3000, backend ở http://localhost:8000
 # Nếu không config CORS → Browser sẽ block request (CORS policy error)
 
+# Lấy CORS config từ environment
+cors_origins = get_cors_origins()
+cors_allow_credentials = get_cors_allow_credentials()
+
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins: Danh sách domain được phép gọi API
-    allow_origins=[
-        "http://localhost:3000",    # React Create React App
-        "http://localhost:5173",    # Vite (default port)
-        "http://localhost:5174",    # Vite (alternative port)
-        "http://127.0.0.1:3000",    # Alternative localhost
-        "http://127.0.0.1:5173",    # Alternative localhost
-        # Khi deploy production, thêm domain thật vào đây:
-        # "https://your-frontend-domain.com"
-    ],
+    # allow_origins: Danh sách domain được phép gọi API (từ environment hoặc mặc định)
+    allow_origins=cors_origins,
     # allow_credentials: Cho phép gửi cookies/credentials
-    allow_credentials=True,
+    allow_credentials=cors_allow_credentials,
     # allow_methods: Cho phép tất cả HTTP methods (GET, POST, PUT, DELETE, etc.)
     allow_methods=["*"],
     # allow_headers: Cho phép tất cả headers (Content-Type, Authorization, etc.)
@@ -159,60 +174,22 @@ app.add_middleware(
 
 # Log khi server khởi động
 logger.info("="*60)
-logger.info("🚀 HUCE Chatbot API Server Starting...")
+logger.info("HUCE Chatbot API Server đang khởi động...")
 logger.info("="*60)
-logger.info("📝 CORS enabled for: localhost:3000, localhost:5173")
-logger.info("📂 Data directory: %s", DATA_DIR)
-logger.info("📊 Swagger docs: http://localhost:8000/docs")
+logger.info("CORS đã bật cho: %s", ", ".join(cors_origins))
+logger.info("Thư mục dữ liệu: %s", DATA_DIR)
+logger.info("Swagger docs: http://localhost:8000/docs")
 logger.info("="*60)
 
 # Lấy NLP service singleton
 # Service này chứa: pipeline (NLP), context_store (lưu context)
 # Được khởi tạo MỘT LẦN khi app start, dùng chung cho mọi request
 nlp = get_nlp_service()
-logger.info("✅ NLP Service initialized successfully")
+logger.info("NLP Service đã khởi tạo thành công")
 
 
 # ============================================================================
-# PHẦN 2: PYDANTIC MODELS - Định nghĩa cấu trúc dữ liệu
-# ============================================================================
-
-class ChatRequest(BaseModel):
-    """
-    Request cho endpoint /chat (phân tích NLP đơn giản).
-    
-    Attributes:
-        message: Câu hỏi từ người dùng
-        
-    Example:
-        {"message": "Điểm chuẩn ngành Kiến trúc"}
-    """
-    message: str
-
-
-class AdvancedChatRequest(BaseModel):
-    """
-    Request cho endpoint /chat/advanced (chat đầy đủ).
-    
-    Attributes:
-        message: Câu hỏi từ người dùng
-        session_id: ID phiên hội thoại (để lưu context riêng từng user)
-        use_context: Có sử dụng context hay không
-        
-    Example:
-        {
-            "message": "Còn điểm sàn?",
-            "session_id": "user_abc_123",
-            "use_context": true
-        }
-    """
-    message: str
-    session_id: Optional[str] = "default"
-    use_context: Optional[bool] = True
-
-
-# ============================================================================
-# PHẦN 3: ENDPOINTS - HEALTH CHECK
+# PHẦN 2: ENDPOINTS - HEALTH CHECK
 # ============================================================================
 
 @app.get("/")
@@ -221,16 +198,16 @@ async def root():
     Health check endpoint - Kiểm tra server hoạt động.
     
     Returns:
-        {"message": "HUCE Chatbot API is running"}
+        {"success": true, "message": "HUCE Chatbot API đang hoạt động"}
         
     Usage:
         curl http://localhost:8000/
     """
-    return {"message": "HUCE Chatbot API is running"}
+    return create_success_response(message="HUCE Chatbot API đang hoạt động")
 
 
 # ============================================================================
-# PHẦN 4: ENDPOINTS - CHAT (Hội thoại)
+# PHẦN 3: ENDPOINTS - CHAT (Hội thoại)
 # ============================================================================
 
 @app.post("/chat")
@@ -253,8 +230,9 @@ async def chat(req: ChatRequest):
         
     Returns:
         {
+            "success": true,
             "intent": str,      # Ý định nhận diện
-            "score": float,     # Độ tin cậy 0-1
+            "confidence": float, # Độ tin cậy 0-1
             "entities": list    # Entities trích xuất
         }
         
@@ -264,8 +242,9 @@ async def chat(req: ChatRequest):
         
     Example Response:
         {
+            "success": true,
             "intent": "hoi_diem_chuan",
-            "score": 0.85,
+            "confidence": 0.85,
             "entities": [
                 {"label": "TEN_NGANH", "text": "kiến trúc"},
                 {"label": "NAM_HOC", "text": "2025"}
@@ -274,28 +253,37 @@ async def chat(req: ChatRequest):
     """
     try:
         # Log request để theo dõi
-        logger.info(f"📨 /chat - Message: {req.message[:100]}")  # Chỉ log 100 ký tự đầu
+        logger.info(f"Endpoint /chat - Tin nhắn: {req.message[:100]}")
         
         # Phân tích NLP
         analysis = nlp.analyze_message(req.message)
         
         # Log kết quả
-        logger.info(f"✅ /chat - Intent: {analysis['intent']} (score: {analysis['score']:.2f})")
+        logger.info(f"Endpoint /chat - Intent: {analysis['intent']} (độ tin cậy: {analysis['score']:.2f})")
         
-        return analysis
+        # Trả về với format chuẩn
+        return {
+            "success": True,
+            "intent": analysis['intent'],
+            "confidence": analysis['score'],
+            "entities": analysis['entities']
+        }
     
+    except ValueError as e:
+        # Lỗi validation
+        logger.warning(f"Lỗi validation tại /chat: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # Log lỗi với stack trace đầy đủ
-        logger.error(f"❌ Error in /chat: {str(e)}", exc_info=True)
-        # Trả về lỗi 500 với message rõ ràng
+        # Lỗi hệ thống
+        logger.error(f"Lỗi hệ thống tại /chat: {str(e)}", exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"Internal server error: {str(e)}"
+            detail=ErrorMessage.INTERNAL_ERROR
         )
 
 
 @app.post("/chat/context")
-async def manage_chat_context(req: Dict[str, Any]):
+async def manage_chat_context(req: ContextRequest):
     """
     Quản lý context hội thoại - get/set/reset.
     
@@ -307,15 +295,15 @@ async def manage_chat_context(req: Dict[str, Any]):
     - "reset": Xóa context (bắt đầu hội thoại mới)
     
     Args:
-        req: Dict chứa:
+        req: ContextRequest chứa:
             - action: "get" | "set" | "reset"
             - session_id: ID phiên (mặc định "default")
             - context: Context mới (chỉ khi action="set")
             
     Returns:
-        - GET: {"context": {...}}
-        - SET: {"message": "Context updated", "context": {...}}
-        - RESET: {"message": "Context reset"}
+        - GET: {"success": true, "context": {...}}
+        - SET: {"success": true, "message": "...", "context": {...}}
+        - RESET: {"success": true, "message": "..."}
         
     Example 1 - Get context:
         POST /chat/context
@@ -325,28 +313,39 @@ async def manage_chat_context(req: Dict[str, Any]):
         POST /chat/context
         {"action": "reset", "session_id": "user_123"}
     """
-    action = req.get("action", "get")
-    session_id = req.get("session_id", "default")
-    
-    if action == "get":
-        # Lấy context của session
-        context = nlp.get_context(session_id)
-        return {"context": context}
-    
-    elif action == "set":
-        # Đặt context mới
-        context = req.get("context", {})
-        nlp.set_context(session_id, context)
-        return {"message": "Context updated", "context": context}
-    
-    elif action == "reset":
-        # Xóa context (bắt đầu hội thoại mới)
-        nlp.reset_context(session_id)
-        return {"message": "Context reset"}
-    
-    else:
-        # Action không hợp lệ
-        return {"error": "Invalid action. Use: get, set, or reset"}
+    try:
+        action = req.action
+        session_id = req.session_id or "default"
+        
+        if action == Validation.ACTION_GET:
+            # Lấy context của session
+            context = nlp.get_context(session_id)
+            logger.info(f"Endpoint /chat/context - Lấy context cho session: {session_id}")
+            return create_success_response() | {"context": context}
+        
+        elif action == Validation.ACTION_SET:
+            # Đặt context mới
+            context = req.context or {}
+            nlp.set_context(session_id, context)
+            logger.info(f"Endpoint /chat/context - Cập nhật context cho session: {session_id}")
+            return create_success_response(message=SuccessMessage.CONTEXT_UPDATED) | {"context": context}
+        
+        elif action == Validation.ACTION_RESET:
+            # Xóa context (bắt đầu hội thoại mới)
+            nlp.reset_context(session_id)
+            logger.info(f"Endpoint /chat/context - Reset context cho session: {session_id}")
+            return create_success_response(message=SuccessMessage.CONTEXT_RESET)
+        
+        else:
+            # Action không hợp lệ (không nên xảy ra vì đã validate trong model)
+            raise ValueError(ErrorMessage.INVALID_ACTION)
+            
+    except ValueError as e:
+        logger.warning(f"Lỗi validation tại /chat/context: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Lỗi hệ thống tại /chat/context: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=ErrorMessage.INTERNAL_ERROR)
 
 
 @app.post("/chat/advanced")
