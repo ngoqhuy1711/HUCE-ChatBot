@@ -1,0 +1,26 @@
+# Dependencies cho Chatbot Frontend với Reflex
+# ============================================
+
+# Reflex - Framework chính để xây dựng web app
+reflex>=0.4.0
+
+# HTTP client để gọi FastAPI backend
+httpx>=0.25.0
+
+# WebSocket và Performance packages (Required!)
+websockets>=15.0.0
+httptools>=0.7.0
+watchfiles>=1.0.0
+python-dotenv>=1.0.0
+
+# Python standard libraries (có sẵn nhưng list ra để rõ ràng)
+# - typing: Type hints
+# - asyncio: Async operations
+# - datetime: Xử lý thời gian
+# - json: Parse JSON responses
+# - pydantic: Data validation (dùng cho Message model)
+
+# Optional: Nếu cần thêm tính năng
+# plotly>=5.17.0        # Để vẽ biểu đồ tương tác
+# pandas>=2.0.0         # Xử lý dữ liệu dạng bảng
+
