@@ -52,13 +52,12 @@ BASE_DIR = os.path.dirname(__file__)
 # Tất cả dữ liệu tuyển sinh nằm ở đây
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
-
 # ============================================================================
 # THAM SỐ MẶC ĐỊNH
 # ============================================================================
 
 # NLP
-INTENT_THRESHOLD_DEFAULT: float = 0.35
+INTENT_THRESHOLD_DEFAULT: float = 0.25  # Giảm từ 0.35 xuống 0.25 để nhận diện tốt hơn
 CONTEXT_HISTORY_LIMIT_DEFAULT: int = 10
 
 # Server
@@ -69,10 +68,12 @@ LOG_LEVEL_DEFAULT: str = "INFO"
 
 # CORS
 CORS_ORIGINS_DEFAULT: List[str] = [
-    "http://localhost:3000",  # React Create React App
+    "http://localhost:3000",  # Reflex frontend
+    "http://localhost:8001",  # Reflex backend (WebSocket)
     "http://localhost:5173",  # Vite
-    "http://localhost:8080",  # Reflex default
+    "http://localhost:8080",  # Fallback
     "http://127.0.0.1:3000",
+    "http://127.0.0.1:8001",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:8080",
 ]

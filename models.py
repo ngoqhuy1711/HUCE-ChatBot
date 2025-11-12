@@ -7,7 +7,8 @@ Tất cả API endpoints sử dụng các models này để:
 3. Tự động generate OpenAPI schema
 """
 
-from typing import Optional, List, Dict, Any, Union
+from typing import Optional, List, Dict, Any
+
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -161,7 +162,7 @@ class ContextResponse(BaseResponse):
 
 
 def create_success_response(
-    data: Optional[List[Dict[str, Any]]] = None, message: Optional[str] = None
+        data: Optional[List[Dict[str, Any]]] = None, message: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Tạo response thành công chuẩn
@@ -182,7 +183,7 @@ def create_success_response(
 
 
 def create_error_response(
-    message: str, error_code: Optional[str] = None, error_detail: Optional[str] = None
+        message: str, error_code: Optional[str] = None, error_detail: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Tạo response lỗi chuẩn
@@ -201,10 +202,10 @@ def create_error_response(
 
 
 def create_nlp_response(
-    intent: str,
-    confidence: float,
-    entities: List[Dict[str, Any]],
-    message: Optional[str] = None,
+        intent: str,
+        confidence: float,
+        entities: List[Dict[str, Any]],
+        message: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Tạo response cho NLP analysis

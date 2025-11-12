@@ -1,4 +1,74 @@
 entity,canonical,alias
+# Majors (general)
+MAJOR,Công nghệ thông tin,CNTT
+MAJOR,Công nghệ thông tin,IT
+MAJOR,Khoa học máy tính,KHMT
+MAJOR,Kỹ thuật xây dựng,Xây dựng
+MAJOR,Kỹ thuật xây dựng,XD
+MAJOR,Kỹ thuật xây dựng,XDDD&CN
+MAJOR,Kiến trúc,KT
+MAJOR,Kinh tế xây dựng,KTXD
+MAJOR,Quản lý xây dựng,QLXD
+MAJOR,Kỹ thuật Môi trường,MT
+MAJOR,Kỹ thuật Môi trường,Môi trường
+# Specializations (use specialization-only names)
+MAJOR,Kiến trúc công nghệ,Công nghệ kiến trúc
+MAJOR,Kiến trúc cảnh quan,Cảnh quan
+MAJOR,Kiến trúc nội thất,Nội thất
+MAJOR,Quy hoạch vùng và đô thị,Quy hoạch đô thị
+MAJOR,Xây dựng Dân dụng va Công nghiệp,XDDD&CN
+MAJOR,Hệ thống kỹ thuật trong công trình,Hệ thống kỹ thuật
+MAJOR,Tin học xây dựng,Tin học XD
+MAJOR,Kỹ thuật công trình thủy,Thủy
+MAJOR,Kỹ thuật công trình biển,Biển
+MAJOR,Kỹ thuật cơ khí,Cơ khí
+MAJOR,Máy xây dựng,Máy XD
+MAJOR,Kỹ thuật cơ điện,Cơ điện
+MAJOR,Kỹ thuật ô tô,Ô tô
+MAJOR,Kỹ thuật ô tô,Auto
+MAJOR,Kỹ thuật điện,Điện
+MAJOR,Kỹ thuật điều khiển và tự động hóa,Tự động hóa
+MAJOR,Logistics và Quản lý chuỗi cung ứng,Logistics
+MAJOR,Logistics đô thị,Log đô thị
+MAJOR,Logistics công nghiệp,Log CN
+MAJOR,Xây dựng Cầu đường,Cầu đường
+MAJOR,Đường sắt tốc độ cao và đường sắt đô thị,Đường sắt đô thị
+MAJOR,Đường sắt tốc độ cao và đường sắt đô thị,ĐSĐT
+MAJOR,Kỹ thuật Cấp thoát nước,Cấp thoát nước
+MAJOR,Kỹ thuật nước - Môi trường nước,Nước - Môi trường
+MAJOR,Công nghệ kỹ thuật vật liệu xây dựng,Vật liệu xây dựng CN
+MAJOR,Kỹ thuật vật liệu,Vật liệu
+MAJOR,Công nghệ đa phương tiện,Đa phương tiện
+MAJOR,An toàn thông tin,ATTT
+MAJOR,Khoa học dữ liệu,KHDL
+MAJOR,Quản lý dự án,QLDA
+MAJOR,Kinh tế và quán lý đô thị,Kinh tế đô thị
+MAJOR,Kinh tế và Quản lý bất động sản,Bất động sản
+MAJOR,Quản lý hạ tầng, đất đai đô thị,Quản lý hạ tầng đô thị
+MAJOR,Kiểm toán đầu tư xây dựng,Kiểm toán XD
+# Methods
+METHOD,THPT,Thi THPT
+METHOD,THPT_NK,THPT kết hợp năng khiếu
+METHOD,THPT_NK,thpt_nk
+METHOD,Xét học bạ,Học bạ
+METHOD,Xét học bạ,HB
+METHOD,Đánh giá năng lực,ĐGNL
+METHOD,TSA,Thi TSA
+METHOD,SPT,SPT
+METHOD,V-SAT,VSAT
+METHOD,CCQT,Chứng chỉ quốc tế
+METHOD,CCQT,ccqt
+# Programs
+PROGRAM,Chất lượng cao,CLC
+PROGRAM,PFIEV,PFIEV
+PROGRAM,Liên kết quốc tế,LKQT
+PROGRAM,Liên kết quốc tế,QT
+# Fees
+FEE,Học phí,HP
+FEE,Học phí,Tiền học
+# Services
+SERVICE,Ký túc xá,KTX
+entity,canonical,alias
 MAJOR,Công nghệ thông tin,CNTT
 MAJOR,Công nghệ thông tin,IT
 MAJOR,Khoa học máy tính,KHMT

@@ -102,7 +102,7 @@ def _extract_by_ner(text: str) -> List[Dict[str, Any]]:
             current_tag = tag[2:]
             buffer_tokens = [token]
         elif (
-            isinstance(tag, str) and tag.startswith("I-") and current_tag == tag[2:]
+                isinstance(tag, str) and tag.startswith("I-") and current_tag == tag[2:]
         ):  # Inside
             buffer_tokens.append(token)
         else:  # Other
@@ -171,18 +171,18 @@ class EntityExtractor:
 
         base = self.data_dir
 
-        # major_intro.csv - Thông tin ngành học
+        # majors.csv - Thông tin ngành học
         add_file(
-            os.path.join(base, "major_intro.csv"),
+            os.path.join(base, "majors.csv"),
             lambda r, p: (
                 (
-                    p.append(("MA_NGANH", normalize_text(r.get("ma_nganh") or "")))
-                    if r.get("ma_nganh")
+                    p.append(("MA_NGANH", normalize_text(r.get("major_code") or "")))
+                    if r.get("major_code")
                     else None
                 ),
                 (
-                    p.append(("TEN_NGANH", normalize_text(r.get("ten_nganh") or "")))
-                    if r.get("ten_nganh")
+                    p.append(("TEN_NGANH", normalize_text(r.get("major_name") or "")))
+                    if r.get("major_name")
                     else None
                 ),
             ),
@@ -196,41 +196,17 @@ class EntityExtractor:
                     p.append(
                         (
                             "PHUONG_THUC_XET_TUYEN",
-                            normalize_text(r.get("phuong_thuc") or ""),
+                            normalize_text(r.get("admission_method") or ""),
                         )
                     )
-                    if r.get("phuong_thuc")
+                    if r.get("admission_method")
                     else None
                 ),
             ),
         )
 
-        # method_condition.csv - Điều kiện xét tuyển
-        add_file(
-            os.path.join(base, "method_condition.csv"),
-            lambda r, p: (
-                (
-                    p.append(
-                        (
-                            "PHUONG_THUC_XET_TUYEN",
-                            normalize_text(r.get("phuong_thuc") or ""),
-                        )
-                    )
-                    if r.get("phuong_thuc")
-                    else None
-                ),
-                (
-                    p.append(
-                        (
-                            "DIEU_KIEN_XET_TUYEN",
-                            normalize_text(r.get("dieu_kien") or ""),
-                        )
-                    )
-                    if r.get("dieu_kien")
-                    else None
-                ),
-            ),
-        )
+        # REMOVED: method_condition.csv - File đã bị xóa trong refactoring
+        # Thông tin điều kiện đã được merge vào admission_conditions.csv
 
         # tuition.csv - Học phí
         add_file(
@@ -240,122 +216,88 @@ class EntityExtractor:
                     p.append(
                         (
                             "HOC_PHI_CATEGORY",
-                            normalize_text(r.get("chuong_trinh") or ""),
+                            normalize_text(r.get("program_type") or ""),
                         )
                     )
-                    if r.get("chuong_trinh")
+                    if r.get("program_type")
                     else None
                 ),
             ),
         )
 
-        # scholarships_huce.csv - Học bổng
+        # scholarships.csv - Học bổng
         add_file(
-            os.path.join(base, "scholarships_huce.csv"),
+            os.path.join(base, "scholarships.csv"),
             lambda r, p: (
                 (
-                    p.append(("HOC_BONG_TEN", normalize_text(r.get("ten") or "")))
-                    if r.get("ten")
+                    p.append(("HOC_BONG_TEN", normalize_text(r.get("scholarship_name") or "")))
+                    if r.get("scholarship_name")
                     else None
                 ),
             ),
         )
 
-        # standard_score.csv - Điểm chuẩn
+        # admission_scores.csv - Điểm chuẩn
         add_file(
-            os.path.join(base, "standard_score.csv"),
+            os.path.join(base, "admission_scores.csv"),
             lambda r, p: (
-                (
-                    p.append(
-                        (
-                            "MA_NGANH",
-                            normalize_text(
-                                r.get("Mã xét tuyển")
-                                or r.get("ma_xet_tuyen")
-                                or r.get("ma_nganh")
-                                or ""
-                            ),
-                        )
-                    )
-                    if (
-                        r.get("Mã xét tuyển")
-                        or r.get("ma_xet_tuyen")
-                        or r.get("ma_nganh")
-                    )
-                    else None
-                ),
                 (
                     p.append(
                         (
                             "TEN_NGANH",
-                            normalize_text(
-                                r.get("Ngành/ Chuyên ngành tuyển sinh")
-                                or r.get("ten_nganh")
-                                or ""
-                            ),
+                            normalize_text(r.get("program_name") or ""),
                         )
                     )
-                    if (r.get("Ngành/ Chuyên ngành tuyển sinh") or r.get("ten_nganh"))
+                    if r.get("program_name")
+                    else None
+                ),
+                # Tổ hợp môn (có thể có nhiều, phân tách bằng dấu phẩy)
+                [
+                    p.append(("TO_HOP_MON", normalize_text(th.strip())))
+                    for th in (r.get("subject_combination") or "").split(",")
+                    if th.strip()
+                ],
+                # Năm học (các cột là số năm: 2020, 2021, 2022, 2023, 2024, 2025)
+                [
+                    p.append(("NAM_HOC", normalize_text(k)))
+                    for k in r.keys()
+                    if k and k.strip().isdigit() and len(k.strip()) == 4
+                ],
+            ),
+        )
+
+        # REMOVED: floor_score.csv - File trống, đã bị xóa trong refactoring
+
+        # admission_targets.csv - Chỉ tiêu tuyển sinh
+        add_file(
+            os.path.join(base, "admission_targets.csv"),
+            lambda r, p: (
+                (
+                    p.append(("MA_NGANH", normalize_text(r.get("major_code") or "")))
+                    if r.get("major_code")
+                    else None
+                ),
+                (
+                    p.append(("MA_XET_TUYEN", normalize_text(r.get("admission_code") or "")))
+                    if r.get("admission_code")
+                    else None
+                ),
+                (
+                    p.append(("TEN_NGANH", normalize_text(r.get("major_name") or "")))
+                    if r.get("major_name")
+                    else None
+                ),
+                (
+                    p.append(("CHUYEN_NGANH", normalize_text(r.get("program_name") or "")))
+                    if r.get("program_name")
                     else None
                 ),
                 # Tổ hợp môn (có thể có nhiều, phân tách bằng dấu phẩy)
                 [
                     p.append(("TO_HOP_MON", normalize_text(th)))
-                    for th in (
-                        normalize_text(r.get("Mã tổ hợp") or r.get("to_hop") or "")
-                    ).split(",")
+                    for th in (normalize_text(r.get("subject_combination") or "")).split(",")
                     if th
                 ],
-                # Năm học (các cột bắt đầu bằng "năm")
-                [
-                    p.append(("NAM_HOC", normalize_text(k)))
-                    for k in r.keys()
-                    if k and normalize_text(k).startswith("năm")
-                ],
-            ),
-        )
-
-        # floor_score.csv - Điểm sàn
-        add_file(
-            os.path.join(base, "floor_score.csv"),
-            lambda r, p: (
-                (
-                    p.append(("MA_NGANH", normalize_text(r.get("ma_nganh") or "")))
-                    if r.get("ma_nganh")
-                    else None
-                ),
-                (
-                    p.append(("TEN_NGANH", normalize_text(r.get("ten_nganh") or "")))
-                    if r.get("ten_nganh")
-                    else None
-                ),
-                (
-                    p.append(("NAM_HOC", normalize_text(r.get("nam") or "")))
-                    if r.get("nam")
-                    else None
-                ),
-            ),
-        )
-
-        # admission_quota.csv - Chỉ tiêu
-        add_file(
-            os.path.join(base, "admission_quota.csv"),
-            lambda r, p: (
-                (
-                    p.append(("MA_NGANH", normalize_text(r.get("ma_nganh") or "")))
-                    if r.get("ma_nganh")
-                    else None
-                ),
-                (
-                    p.append(("TEN_NGANH", normalize_text(r.get("ten_nganh") or "")))
-                    if r.get("ten_nganh")
-                    else None
-                ),
-                (
-                    p.append(("NAM_HOC", normalize_text(r.get("nam") or "")))
-                    if r.get("nam")
-                    else None
-                ),
             ),
         )
 
@@ -367,64 +309,34 @@ class EntityExtractor:
                     p.append(
                         (
                             "PHUONG_THUC_XET_TUYEN",
-                            normalize_text(r.get("phuong_thuc") or ""),
+                            normalize_text(r.get("admission_method") or ""),
                         )
                     )
-                    if r.get("phuong_thuc")
+                    if r.get("admission_method")
                     else None
                 ),
                 (
-                    p.append(("THOI_GIAN_BUOC", normalize_text(r.get("buoc") or "")))
-                    if r.get("buoc")
-                    else None
-                ),
-                (
-                    p.append(("URL", normalize_text(r.get("url") or "")))
-                    if r.get("url")
+                    p.append(("THOI_GIAN_BUOC", normalize_text(r.get("timeline") or "")))
+                    if r.get("timeline")
                     else None
                 ),
             ),
         )
 
-        # apply_channel.csv - Kênh nộp hồ sơ
-        add_file(
-            os.path.join(base, "apply_channel.csv"),
-            lambda r, p: (
-                (
-                    p.append(("KENH_NOP_HO_SO", normalize_text(r.get("kenh") or "")))
-                    if r.get("kenh")
-                    else None
-                ),
-                (
-                    p.append(("URL", normalize_text(r.get("url") or "")))
-                    if r.get("url")
-                    else None
-                ),
-                (
-                    p.append(
-                        (
-                            "PHUONG_THUC_XET_TUYEN",
-                            normalize_text(r.get("phuong_thuc") or ""),
-                        )
-                    )
-                    if r.get("phuong_thuc")
-                    else None
-                ),
-            ),
-        )
+        # REMOVED: apply_channel.csv - File đã bị xóa trong refactoring
 
-        # contact.csv - Thông tin liên hệ
+        # contact_info.csv - Thông tin liên hệ
         add_file(
-            os.path.join(base, "contact.csv"),
+            os.path.join(base, "contact_info.csv"),
             lambda r, p: (
                 (
-                    p.append(("DON_VI_LIEN_HE", normalize_text(r.get("co_quan") or "")))
-                    if r.get("co_quan")
+                    p.append(("DON_VI_LIEN_HE", normalize_text(r.get("university_name") or "")))
+                    if r.get("university_name")
                     else None
                 ),
                 (
-                    p.append(("DIA_CHI", normalize_text(r.get("dia_chi") or "")))
-                    if r.get("dia_chi")
+                    p.append(("DIA_CHI", normalize_text(r.get("address") or "")))
+                    if r.get("address")
                     else None
                 ),
                 (
@@ -433,8 +345,8 @@ class EntityExtractor:
                     else None
                 ),
                 (
-                    p.append(("DIEN_THOAI", normalize_text(r.get("dien_thoai") or "")))
-                    if r.get("dien_thoai")
+                    p.append(("DIEN_THOAI", normalize_text(r.get("phone") or "")))
+                    if r.get("phone")
                     else None
                 ),
                 (
@@ -450,48 +362,51 @@ class EntityExtractor:
             ),
         )
 
-        # certificate_mapping.csv - Chứng chỉ
+        # cefr_conversion.csv - Chứng chỉ ngoại ngữ quốc tế
         add_file(
-            os.path.join(base, "certificate_mapping.csv"),
+            os.path.join(base, "cefr_conversion.csv"),
             lambda r, p: (
                 (
-                    p.append(
-                        ("CHUNG_CHI_UU_TIEN", normalize_text(r.get("chung_chi") or ""))
-                    )
-                    if r.get("chung_chi")
+                    p.append(("CHUNG_CHI_UU_TIEN", normalize_text("IELTS")))
+                    if r.get("IELTS")
                     else None
                 ),
                 (
-                    p.append(
-                        ("MUC_DO_CHUNG_CHI", normalize_text(r.get("muc_do") or ""))
-                    )
-                    if r.get("muc_do")
+                    p.append(("CHUNG_CHI_UU_TIEN", normalize_text("TOEFL iBT")))
+                    if r.get("TOEFL iBT")
+                    else None
+                ),
+                (
+                    p.append(("CHUNG_CHI_UU_TIEN", normalize_text("TOEIC")))
+                    if r.get("TOEIC")
                     else None
                 ),
             ),
         )
 
-        # admissions_sector.csv - Khối tuyển sinh
+        # subject_combinations.csv - Tổ hợp môn thi
         add_file(
-            os.path.join(base, "admissions_sector.csv"),
+            os.path.join(base, "subject_combinations.csv"),
             lambda r, p: (
                 (
-                    p.append(("MA_NGANH", normalize_text(r.get("ma_nganh") or "")))
-                    if r.get("ma_nganh")
+                    p.append(("TO_HOP_MON", normalize_text(r.get("combination_code") or "")))
+                    if r.get("combination_code")
                     else None
                 ),
                 (
-                    p.append(("TEN_NGANH", normalize_text(r.get("ten_nganh") or "")))
-                    if r.get("ten_nganh")
+                    p.append(("TO_HOP_MON_TEN", normalize_text(r.get("subject_names") or "")))
+                    if r.get("subject_names")
                     else None
                 ),
                 (
-                    p.append(("TO_HOP_MON", normalize_text(r.get("to_hop") or "")))
-                    if r.get("to_hop")
+                    p.append(("KY_THI", normalize_text(r.get("exam_type") or "")))
+                    if r.get("exam_type")
                     else None
                 ),
             ),
         )
+
+        # REMOVED: admissions_sector.csv - File không tồn tại
 
         # admission_conditions.csv - Điều kiện tuyển sinh
         add_file(
@@ -506,51 +421,26 @@ class EntityExtractor:
                     p.append(
                         (
                             "PHUONG_THUC_XET_TUYEN",
-                            normalize_text(r.get("phuong_thuc") or ""),
+                            normalize_text(r.get("admission_method") or ""),
                         )
                     )
-                    if r.get("phuong_thuc")
+                    if r.get("admission_method")
                     else None
                 ),
                 (
                     p.append(
                         (
                             "DIEU_KIEN_XET_TUYEN",
-                            normalize_text(r.get("dieu_kien") or ""),
+                            normalize_text(r.get("requirements") or ""),
                         )
                     )
-                    if r.get("dieu_kien")
+                    if r.get("requirements")
                     else None
                 ),
             ),
         )
 
-        # admission_method_for_each_major.csv - Phương thức cho từng ngành
-        add_file(
-            os.path.join(base, "admission_method_for_each_major.csv"),
-            lambda r, p: (
-                (
-                    p.append(("MA_NGANH", normalize_text(r.get("ma_nganh") or "")))
-                    if r.get("ma_nganh")
-                    else None
-                ),
-                (
-                    p.append(("TEN_NGANH", normalize_text(r.get("ten_nganh") or "")))
-                    if r.get("ten_nganh")
-                    else None
-                ),
-                (
-                    p.append(
-                        (
-                            "PHUONG_THUC_XET_TUYEN",
-                            normalize_text(r.get("phuong_thuc") or ""),
-                        )
-                    )
-                    if r.get("phuong_thuc")
-                    else None
-                ),
-            ),
-        )
+        # REMOVED: admission_method_for_each_major.csv - File không tồn tại
 
         # Loại bỏ phrases rỗng và trùng lặp
         cleaned: List[Tuple[str, str]] = []

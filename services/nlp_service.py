@@ -67,6 +67,7 @@ SAU (1 file gộp):
 """
 
 from typing import Dict, Any
+
 from config import get_intent_threshold, get_context_history_limit
 from nlu.pipeline import NLPPipeline
 
@@ -250,7 +251,7 @@ class NLPService:
         return self.pipeline.analyze(message)
 
     def handle_message(
-        self, message: str, current_context: Dict[str, Any]
+            self, message: str, current_context: Dict[str, Any]
     ) -> Dict[str, Any]:
         """
         Xử lý câu hỏi HOÀN CHỈNH: NLP + lấy dữ liệu + fallback.
@@ -318,16 +319,16 @@ class NLPService:
 
         # Bước 2: Kiểm tra confidence và xử lý
         if (
-            analysis["intent"] == "fallback"
-            or analysis["score"] < self.intent_threshold
+                analysis["intent"] == "fallback"
+                or analysis["score"] < self.intent_threshold
         ):
-            # Intent không rõ → Dùng fallback
+            # Intent không rõ → Dùng fallback (đã có gợi ý liên hệ sẵn)
             response = csvs.handle_fallback_query(message, current_context)
             # Đánh dấu đây là fallback response
             analysis["intent"] = "fallback_response"
         else:
             # Intent rõ ràng → Xử lý theo intent
-            response = csvs.handle_intent_query(analysis, current_context)
+            response = csvs.handle_intent_query(analysis, current_context, message)
 
         # Bước 3: Trả về kết quả đầy đủ
         return {"analysis": analysis, "response": response}

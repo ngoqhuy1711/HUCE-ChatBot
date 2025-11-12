@@ -5,6 +5,7 @@ API Backend cho hệ thống Chatbot tư vấn tuyển sinh Đại học Xây d�
 ## 🎯 Tổng quan
 
 Hệ thống cung cấp API để tra cứu thông tin tuyển sinh:
+
 - **Ngành học**: Danh sách ngành, mã ngành, khối thi, tổ hợp môn
 - **Điểm số**: Điểm chuẩn, điểm sàn theo năm và ngành
 - **Học phí & Học bổng**: Thông tin chi phí và các chương trình hỗ trợ
@@ -12,6 +13,7 @@ Hệ thống cung cấp API để tra cứu thông tin tuyển sinh:
 - **Gợi ý thông minh**: Đề xuất ngành phù hợp theo điểm số
 
 ### Công nghệ sử dụng
+
 - **Framework**: FastAPI (Python 3.13+)
 - **NLP**: Underthesea (xử lý tiếng Việt)
 - **Phương pháp**: TF-IDF + Cosine Similarity cho intent detection
@@ -24,11 +26,13 @@ Hệ thống cung cấp API để tra cứu thông tin tuyển sinh:
 ### Bước 1: Cài đặt uv (package manager)
 
 **Windows:**
+
 ```bash
 pip install uv
 ```
 
 **macOS/Linux:**
+
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
@@ -67,14 +71,17 @@ API Documentation: **http://localhost:8000/docs**
 ## 📡 API Endpoints
 
 ### 1. Kiểm tra hệ thống
+
 ```http
 GET /
 ```
+
 Kiểm tra server hoạt động
 
 ### 2. Chat & NLP
 
 **Phân tích NLP đơn giản:**
+
 ```http
 POST /chat
 Content-Type: application/json
@@ -85,6 +92,7 @@ Content-Type: application/json
 ```
 
 **Chat đầy đủ (có context):**
+
 ```http
 POST /chat/advanced
 Content-Type: application/json
@@ -97,6 +105,7 @@ Content-Type: application/json
 ```
 
 **Quản lý context:**
+
 ```http
 POST /chat/context
 Content-Type: application/json
@@ -109,16 +118,16 @@ Content-Type: application/json
 
 ### 3. Tra cứu dữ liệu
 
-| Endpoint | Mô tả | Query params |
-|----------|-------|--------------|
-| `GET /nganh` | Danh sách ngành | `?q=kiến trúc` |
-| `GET /diem` | Điểm chuẩn/sàn | `?score_type=chuan&major=kiến trúc&year=2025` |
-| `GET /hocphi` | Học phí | `?year=2025` |
-| `GET /hocbong` | Học bổng | `?q=khuyến khích` |
-| `GET /chi-tieu` | Chỉ tiêu tuyển sinh | `?major=kiến trúc&year=2025` |
-| `GET /lich` | Lịch tuyển sinh | `?phuong_thuc=THPT` |
-| `GET /kenh-nop` | Kênh nộp hồ sơ | `?phuong_thuc=THPT` |
-| `GET /dieu-kien` | Điều kiện xét tuyển | `?phuong_thuc=THPT&year=2025` |
+| Endpoint         | Mô tả               | Query params                                  |
+|------------------|---------------------|-----------------------------------------------|
+| `GET /nganh`     | Danh sách ngành     | `?q=kiến trúc`                                |
+| `GET /diem`      | Điểm chuẩn/sàn      | `?score_type=chuan&major=kiến trúc&year=2025` |
+| `GET /hocphi`    | Học phí             | `?year=2025`                                  |
+| `GET /hocbong`   | Học bổng            | `?q=khuyến khích`                             |
+| `GET /chi-tieu`  | Chỉ tiêu tuyển sinh | `?major=kiến trúc&year=2025`                  |
+| `GET /lich`      | Lịch tuyển sinh     | `?phuong_thuc=THPT`                           |
+| `GET /kenh-nop`  | Kênh nộp hồ sơ      | `?phuong_thuc=THPT`                           |
+| `GET /dieu-kien` | Điều kiện xét tuyển | `?phuong_thuc=THPT&year=2025`                 |
 
 ### 4. Gợi ý ngành
 
@@ -138,6 +147,7 @@ Content-Type: application/json
 ## 🧠 Kiến trúc NLP
 
 ### Luồng xử lý
+
 ```
 Câu hỏi người dùng
     ↓
@@ -170,16 +180,16 @@ Trả về kết quả
 
 ### Dữ liệu huấn luyện
 
-| File | Mục đích |
-|------|----------|
-| `intent.csv` | Mẫu câu cho intent detection |
-| `entity.json` | Pattern cho entity extraction |
-| `synonym.csv` | Từ đồng nghĩa, viết tắt |
-| `major_intro.csv` | Thông tin ngành học |
-| `standard_score.csv` | Điểm chuẩn 2023-2025 |
-| `floor_score.csv` | Điểm sàn theo phương thức |
-| `tuition.csv` | Học phí |
-| `scholarships_huce.csv` | Học bổng |
+| File                    | Mục đích                      |
+|-------------------------|-------------------------------|
+| `intent.csv`            | Mẫu câu cho intent detection  |
+| `entity.json`           | Pattern cho entity extraction |
+| `synonym.csv`           | Từ đồng nghĩa, viết tắt       |
+| `major_intro.csv`       | Thông tin ngành học           |
+| `standard_score.csv`    | Điểm chuẩn 2023-2025          |
+| `floor_score.csv`       | Điểm sàn theo phương thức     |
+| `tuition.csv`           | Học phí                       |
+| `scholarships_huce.csv` | Học bổng                      |
 
 ---
 
@@ -211,6 +221,7 @@ MAX_SUGGESTIONS=20                 # Giới hạn gợi ý ngành
 ### Config trong Code
 
 File `constants.py` chứa tất cả hằng số:
+
 - Intent names
 - Entity labels
 - Response types
@@ -297,11 +308,13 @@ backend/
 ## 🎓 Tính năng nâng cao
 
 ### 1. Context Management
+
 - Lưu 10 câu hội thoại gần nhất mỗi session
 - Hiểu câu hỏi tiếp theo dựa vào ngữ cảnh
 - Mỗi user có `session_id` riêng
 
 **Ví dụ:**
+
 ```
 User: "Điểm chuẩn ngành Kiến trúc?"
 Bot: "25.5 điểm"
@@ -310,17 +323,21 @@ Bot: "22.0 điểm"
 ```
 
 ### 2. Fallback thông minh
+
 - Khi không nhận diện được intent rõ ràng (score < 0.35)
 - Tự động tìm kiếm theo từ khóa
 - Gợi ý cách hỏi rõ hơn
 
 ### 3. CSV Caching
+
 - Cache dữ liệu CSV theo modification time
 - Tự động reload khi file thay đổi
 - Giảm 90% I/O operations
 
 ### 4. Response chuẩn hóa
+
 Tất cả endpoints trả về format nhất quán:
+
 ```json
 {
   "success": true,
@@ -335,21 +352,24 @@ Tất cả endpoints trả về format nhất quán:
 ## 📝 Lưu ý quan trọng
 
 ### Cho Developer
+
 - **Python version**: Yêu cầu 3.13+
 - **Encoding**: Tất cả CSV phải UTF-8
 - **Context**: Lưu trong RAM, mất khi restart server
 - **Production**: Nên dùng Redis cho context store
 
 ### Cho Frontend Developer
+
 - **CORS**: Đã config sẵn cho React (3000), Vite (5173), Reflex (8080)
 - **Response format**: Luôn check `response.success` trước khi xử lý data
 - **Session ID**: Generate unique ID cho mỗi user để lưu context
-- **Error handling**: 
-  - 400: Bad request
-  - 422: Validation error
-  - 500: Server error
+- **Error handling**:
+    - 400: Bad request
+    - 422: Validation error
+    - 500: Server error
 
 ### Performance
+
 - **Response time**: < 200ms (với cache)
 - **Memory**: ~100MB (tất cả CSV loaded)
 - **Concurrent users**: 50+ (FastAPI async)
@@ -359,6 +379,7 @@ Tất cả endpoints trả về format nhất quán:
 ## 🐛 Troubleshooting
 
 ### Server không start
+
 ```bash
 # Kiểm tra import
 uv run python -c "import main; print('OK')"
@@ -368,17 +389,20 @@ cat logs/chatbot.log
 ```
 
 ### CORS errors
+
 ```bash
 # Thêm origin vào .env
 echo "CORS_ORIGINS=http://localhost:8080" >> .env
 ```
 
 ### NLP không chính xác
+
 - Kiểm tra file `data/intent.csv` có đủ mẫu câu
 - Điều chỉnh `INTENT_THRESHOLD` trong .env
 - Thêm từ đồng nghĩa vào `data/synonym.csv`
 
 ### Tests fail
+
 ```bash
 # Đảm bảo server đang chạy
 curl http://localhost:8000/

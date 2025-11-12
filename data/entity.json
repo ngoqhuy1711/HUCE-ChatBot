@@ -5,6 +5,66 @@
   },
   {
     "label": "PHUONG_THUC_TUYEN_SINH",
+    "pattern": "CCQT"
+  },
+  {
+    "label": "PHUONG_THUC_TUYEN_SINH",
+    "pattern": [
+      {
+        "LOWER": "ccqt"
+      }
+    ]
+  },
+  {
+    "label": "PHUONG_THUC_TUYEN_SINH",
+    "pattern": "THPT_NK"
+  },
+  {
+    "label": "PHUONG_THUC_TUYEN_SINH",
+    "pattern": [
+      {
+        "LOWER": "thpt_nk"
+      }
+    ]
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "K00"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "SP1"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "SP2"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "SP3"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "SP4"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "VS1"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "VS2"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "VS3"
+  },
+  {
+    "label": "TO_HOP_MON",
+    "pattern": "VS4"
+  },
+  {
+    "label": "PHUONG_THUC_TUYEN_SINH",
     "pattern": "Kỳ thi năng lực/Đánh giá (TSA, ĐGNL, V-SAT)"
   },
   {

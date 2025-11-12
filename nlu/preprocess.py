@@ -21,7 +21,6 @@ except ImportError:  # fallback nếu không cài đặt được
     def word_tokenize(text: str):
         return text.split()
 
-
 # Từ dừng tiếng Việt (có thể mở rộng)
 VI_STOPWORDS: Set[str] = {
     "là",

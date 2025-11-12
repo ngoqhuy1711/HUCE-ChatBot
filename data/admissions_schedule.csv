@@ -1,11 +1,6 @@
-nam,phuong_thuc,buoc,start_date,end_date,url
-2025,"TSA, SPT",ĐK NV trên Hệ thống Bộ GDĐT,2025-07-16,2025-07-28,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,V-SAT,Bước 1: Đăng ký trên hệ thống V-SAT,2025-06-20,2025-06-30,https://V-SAT.huce.edu.vn
-2025,V-SAT,Bước 2: ĐK NV trên Hệ thống Bộ GDĐT,2025-07-16,2025-07-28,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,Chứng chỉ quốc tế,Bước 1: Điền phiếu đăng ký theo mẫu,2025-05-30,2025-06-30,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,Chứng chỉ quốc tế,Bước 2: Hoàn thiện hồ sơ theo file thông tin tuyển sinh,2025-05-30,2025-06-30,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,Chứng chỉ quốc tế,Bước 4: ĐK NV trên Hệ thống Bộ GDĐT,2025-07-16,2025-07-28,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,Tuyển thẳng,Bước 1: Nộp hồ sơ trực tiếp hoặc qua bưu điện,2025-05-30,2025-06-30,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,Tuyển thẳng,Bước 2: ĐK NV trên Hệ thống Bộ GDĐT,2025-07-16,2025-07-28,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
-2025,Ưu tiên xét tuyển,Bước 1: Đăng ký trên hệ thống UTXT,2025-05-15,2025-06-20,https://utxt.huce.edu.vn
-2025,Ưu tiên xét tuyển,Bước 2: ĐK NV trên Hệ thống Bộ GDĐT,2025-07-16,2025-07-28,https://tuyensinh.huce.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2025-4
+event_name,timeline,admission_method,note
+Đăng ký học bạ trên hệ thống Trường,15/5/2025 - 20/6/2025 (24h00),HB,Đăng ký tại https://xthb.huce.edu.vn
+Đăng ký V-SAT trên hệ thống Trường,20/6/2025 - 30/6/2025 (24h00),VSAT,Đăng ký tại V-SAT.huce.edu.vn
+Đăng ký tuyển thẳng và CCQT,30/5/2025 - 30/6/2025 (17h00),"TT,CCQT",Nộp hồ sơ trực tiếp hoặc qua bưu điện
+Công bố kết quả tuyển thẳng,15/7/2025,TT,
+Đăng ký trên hệ thống Bộ GDĐT,16/7/2025 - 28/7/2025 (17h00),Tất cả,Đăng ký tại Hệ thống hỗ trợ tuyển sinh chung

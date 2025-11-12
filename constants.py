@@ -5,6 +5,7 @@ Tập trung tất cả magic strings, intent names, entity labels vào đây
 để dễ bảo trì và tránh typo.
 """
 
+
 # ==============================================================================
 # INTENT NAMES - Tên các intent được nhận diện
 # ==============================================================================

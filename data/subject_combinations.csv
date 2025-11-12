@@ -1,0 +1,33 @@
+combination_code,subject_names,exam_type,note
+A00,"Toán, Vật lý, Hoá học","THPT, THPT_NK, HB",
+A01,"Toán, Vật lý, Tiếng Anh","THPT, THPT_NK, HB",
+A02,"Toán, Vật lý, Sinh học","THPT, THPT_NK, HB",
+B00,"Toán, Hóa học, Sinh học","THPT, THPT_NK, HB",
+C01,"Ngữ văn, Toán, Vật lý","THPT, THPT_NK, HB",
+C02,"Ngữ văn, Toán, Hóa học","THPT, THPT_NK, HB",
+D01,"Toán, Ngữ văn, Tiếng Anh","THPT, THPT_NK, HB",
+D07,"Toán, Hóa học, Tiếng Anh","THPT, THPT_NK, HB",
+D24,"Toán, Hóa học, Tiếng Pháp","THPT, THPT_NK, HB",
+D29,"Toán, Vật lý, Tiếng Pháp","THPT, THPT_NK, HB",
+H00,"Ngữ văn, Hình họa, Bố cục/Trang trí","THPT, THPT_NK, HB",
+H07,"Toán, Hình họa, Bố cục/Trang trí","THPT, THPT_NK, HB",
+V00,"Toán, Vật lý, Vẽ Mỹ Thuật","THPT, THPT_NK, HB",Môn Vẽ Mỹ Thuật là tổng điểm của 2 bài thi: Hình họa và Sáng tác.
+V01,"Toán, Ngữ văn, Vẽ Mỹ Thuật","THPT, THPT_NK, HB",Môn Vẽ Mỹ Thuật là tổng điểm của 2 bài thi: Hình họa và Sáng tác.
+V02,"Toán, Tiếng Anh, Vẽ Mỹ Thuật","THPT, THPT_NK, HB",Môn Vẽ Mỹ Thuật là tổng điểm của 2 bài thi: Hình họa và Sáng tác.
+V06,"Toán, Địa lý, Vẽ Mỹ Thuật","THPT, THPT_NK, HB",Môn Vẽ Mỹ Thuật là tổng điểm của 2 bài thi: Hình họa và Sáng tác.
+V10,"Toán, Tiếng Pháp, Vẽ Mỹ Thuật","THPT, THPT_NK, HB",Môn Vẽ Mỹ Thuật là tổng điểm của 2 bài thi: Hình họa và Sáng tác.
+X05,"Toán, Vật lý, Giáo dục Kinh tế và pháp luật","THPT, THPT_NK, HB",
+X06,"Toán, Vật lý, Tin học","THPT, THPT_NK, HB",
+X14,"Toán, Sinh học, Tin học","THPT, THPT_NK, HB",
+X26,"Toán, Tin học, Tiếng Anh","THPT, THPT_NK, HB",
+K00,"Tư duy Toán học, Tư duy đọc hiểu, Tư duy khoa học/Giải quyết vấn đề",TSA,
+SP1,"Toán, Vật lý, Hoá học",SPT,
+SP2,"Toán, Vật lý, Tiếng Anh",SPT,
+SP3,"Toán, Hóa học, Tiếng Anh",SPT,
+SP4,"Toán, Ngữ văn, Tiếng Anh",SPT,
+SP5,"Toán, Hóa học, Sinh học",SPT,
+VS1,"Toán, Vật lý, Hoá học",VSAT,
+VS2,"Toán, Vật lý, Tiếng Anh",VSAT,
+VS3,"Toán, Hóa học, Tiếng Anh",VSAT,
+VS4,"Toán, Ngữ văn, Tiếng Anh",VSAT,
+VS5,"Toán, Hóa học, Sinh học",VSAT,

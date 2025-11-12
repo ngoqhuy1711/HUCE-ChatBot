@@ -116,10 +116,10 @@ class IntentDetector:
     """
 
     def __init__(
-        self,
-        intent_samples: Dict[str, List[List[str]]],
-        intent_keyword_backoff: Dict[str, str],
-        threshold: float = DEFAULT_INTENT_THRESHOLD,
+            self,
+            intent_samples: Dict[str, List[List[str]]],
+            intent_keyword_backoff: Dict[str, str],
+            threshold: float = DEFAULT_INTENT_THRESHOLD,
     ) -> None:
         """
         Khởi tạo Intent Detector
@@ -181,7 +181,7 @@ class IntentDetector:
 
     # ---------- Public API ----------
     def detect(
-        self, text: str, synonym_map: Dict[str, str], normalize_for_kw_fn
+            self, text: str, synonym_map: Dict[str, str], normalize_for_kw_fn
     ) -> Tuple[str, float]:
         """
         Nhận diện intent của câu hỏi
@@ -203,7 +203,7 @@ class IntentDetector:
         best_score = 0.0
         for intent, centroid in self.intent_centroids.items():
             score = (
-                _cosine(q_vec, centroid) * 1.05
+                    _cosine(q_vec, centroid) * 1.05
             )  # Bonus cho intent bắt đầu bằng "hoi_"
             if score > best_score:
                 best_score = score
@@ -217,7 +217,9 @@ class IntentDetector:
         norm_text = normalize_for_kw_fn(text)
         for kw, mapped_intent in self.intent_keyword_backoff.items():
             if kw in norm_text:
-                return mapped_intent, best_score
+                # Trả về score cao hơn threshold để pass check
+                # Score = threshold + 0.01 để đảm bảo được chấp nhận
+                return mapped_intent, self.threshold + 0.01
 
         # Nếu không match gì: trả về fallback
         return "fallback", best_score
