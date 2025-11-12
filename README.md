@@ -45,9 +45,7 @@ Giải pháp full-stack cung cấp trợ lý ảo hỗ trợ thí sinh tra cứu
 ├── services/                 # Business logic & intent handlers
 ├── frontend/                 # Mã nguồn Reflex frontend
 │   ├── chatbot/              # Ứng dụng Reflex (components, state, API client)
-│   ├── pyproject.toml        # Dependencies frontend
-│   ├── rxconfig.py           # Cấu hình Reflex (port, backend URL)
-│   └── uv.lock               # Lockfile cho uv
+│   └── rxconfig.py           # Cấu hình Reflex (port, backend URL)
 ├── tools/                    # Tiện ích (generate intents, test queries)
 ├── README.md
 └── uv.lock
@@ -59,14 +57,14 @@ Giải pháp full-stack cung cấp trợ lý ảo hỗ trợ thí sinh tra cứu
 
 ### 1. Chuẩn bị
 
-- Python 3.13+ cho backend, Python 3.10+ cho frontend.
-- [uv](https://github.com/astral-sh/uv) để quản lý môi trường (khuyến nghị).
+- Python 3.13+ (cho cả backend và frontend)
+- [uv](https://github.com/astral-sh/uv) để quản lý môi trường (khuyến nghị)
 
 ```bash
 pip install uv
 ```
 
-### 2. Cài đặt backend
+### 2. Cài đặt dependencies
 
 ```bash
 cd C:\Users\ngoqh\DATN
@@ -77,14 +75,7 @@ cp env.example .env
 # Cập nhật các biến nếu cần (CORS_ORIGINS, LOG_LEVEL, INTENT_THRESHOLD)
 ```
 
-### 3. Cài đặt frontend
-
-```bash
-cd frontend
-uv sync
-```
-
-> Lưu ý: Frontend và backend dùng môi trường độc lập. Nếu bạn ưa thích venv/conda, hãy tạo 2 môi trường riêng.
+> Lưu ý: Tất cả dependencies (backend + frontend) được cài đặt trong một môi trường duy nhất.
 
 ---
 
@@ -112,6 +103,8 @@ uv run reflex run
 - WebSocket backend (Reflex): `ws://localhost:8001`
 - Cấu hình kết nối backend nằm trong `frontend/rxconfig.py`
 
+> Lưu ý: Cả backend và frontend đều chạy từ cùng một môi trường Python (root `.venv`).
+
 ---
 
 ## Cấu hình & biến môi trường
@@ -134,7 +127,7 @@ CORS_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:8080
 
 ### Frontend
 
-- Sử dụng `rxconfig.py` để chỉnh `backend_url`, `port`, `backend_port`.
+- Sử dụng `frontend/rxconfig.py` để chỉnh `backend_url`, `port`, `backend_port`.
 - Hỗ trợ `.env` (thông qua `python-dotenv`) nếu cần override cấu hình runtime.
 
 ---

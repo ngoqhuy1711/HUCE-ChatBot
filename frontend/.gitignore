@@ -1,61 +1,6 @@
-assets/external/
-.web
-.states
-# Reflex build outputs
-.web/
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Python virtual environments
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
-venv/
-.venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# UV specific
-# uv.lock - should commit for reproducible builds
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Environment variables
-.env
-.env.local
-
-# Logs
-*.log
-logs/
-
-# Database
 *.db
-*.sqlite
-*.sqlite3
+assets/external/
+*.py[cod]
+__pycache__/
+.states
+.web

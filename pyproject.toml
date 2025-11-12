@@ -1,15 +1,27 @@
 [project]
-name = "backend"
+name = "chatbot-huce"
 version = "0.1.0"
-description = "Chatbot Tư vấn Tuyển sinh HUCE - Backend API"
+description = "Chatbot Tư vấn Tuyển sinh HUCE - Full Stack (Backend + Frontend)"
 requires-python = ">=3.13"
 dependencies = [
-    # FastAPI - Framework chính
+    # Backend - FastAPI Framework
     "fastapi==0.121.1",
-    # Uvicorn server - ASGI server
+    # Backend - Uvicorn server - ASGI server
     "uvicorn[standard]==0.38.0",
-    # NLP - Underthesea cho tokenization tiếng Việt
+    # Backend - NLP - Underthesea cho tokenization tiếng Việt
     "underthesea==8.3.0",
-    # Utilities - Regex cho text processing
+    # Backend - Utilities - Regex cho text processing
     "regex==2025.11.3",
+    # Frontend - Reflex Framework
+    "reflex==0.8.19",
+    # Frontend - HTTP client để gọi FastAPI backend
+    "httpx>=0.25.0",
+    # Frontend - WebSocket và Performance packages
+    "websockets>=15.0.0",
+    "httptools>=0.7.0",
+    "watchfiles>=1.0.0",
+    # Frontend - Environment variables
+    "python-dotenv>=1.0.0",
+    # Build system
+    "hatchling>=1.27.0",
 ]
