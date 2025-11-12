@@ -51,7 +51,3 @@ frontend/assets/external/
 frontend/.venv/
 frontend/backend_log.txt
 
-# Backend specific (nếu cần)
-backend/logs/
-backend/.venv/
-
