@@ -319,7 +319,7 @@ async def advanced_chat(req: AdvancedChatRequest):
     try:
         # Log request với session_id để tracking user
         logger.info(
-            f"💬 /chat/advanced - Session: {req.session_id} - Message: {req.message[:100]}"
+            f"/chat/advanced - Session: {req.session_id} - Message: {req.message[:100]}"
         )
 
         message = req.message
@@ -336,7 +336,7 @@ async def advanced_chat(req: AdvancedChatRequest):
 
         # Log kết quả phân tích
         logger.info(
-            f"✅ /chat/advanced - Intent: {analysis['intent']} "
+            f"/chat/advanced - Intent: {analysis['intent']} "
             f"(score: {analysis['score']:.2f}) - "
             f"Response type: {response.get('type', 'unknown')}"
         )
@@ -357,7 +357,7 @@ async def advanced_chat(req: AdvancedChatRequest):
     except Exception as e:
         # Log lỗi chi tiết để debug
         logger.error(
-            f"❌ Error in /chat/advanced - Session: {req.session_id} - "
+            f"Error in /chat/advanced - Session: {req.session_id} - "
             f"Message: {req.message[:100]} - Error: {str(e)}",
             exc_info=True,
         )

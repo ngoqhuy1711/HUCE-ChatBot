@@ -15,32 +15,26 @@ from chatbot.state import ChatState
 # Danh sách câu hỏi gợi ý
 SUGGESTIONS = [
     {
-        "icon": "📚",
         "text": "Điều kiện tuyển sinh năm 2025?",
         "color": "#0052CC",
     },
     {
-        "icon": "🎯",
         "text": "Điểm chuẩn các ngành?",
         "color": "#2563EB",
     },
     {
-        "icon": "💰",
         "text": "Học phí và học bổng?",
         "color": "#7C3AED",
     },
     {
-        "icon": "📅",
         "text": "Lịch tuyển sinh?",
         "color": "#059669",
     },
     {
-        "icon": "🏗️",
         "text": "Ngành Kỹ thuật Xây dựng?",
         "color": "#DC2626",
     },
     {
-        "icon": "🌉",
         "text": "Ngành Kỹ thuật Cầu đường?",
         "color": "#EA580C",
     },
@@ -68,7 +62,6 @@ def suggested_questions() -> rx.Component:
             *[
                 rx.button(
                     rx.hstack(
-                        rx.text(item["icon"], font_size="1.25rem"),
                         rx.text(
                             item["text"],
                             font_size="0.95rem",
@@ -79,7 +72,6 @@ def suggested_questions() -> rx.Component:
                                 LIGHT_COLORS["text_primary"],
                             ),
                         ),
-                        spacing=SPACING["sm"],
                         align_items="center",
                     ),
                     

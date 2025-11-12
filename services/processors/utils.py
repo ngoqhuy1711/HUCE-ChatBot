@@ -234,7 +234,7 @@ def format_data_to_text(data: List[Dict[str, Any]], data_type: str) -> str:
                 lines.append("")
 
             if additional_info:
-                lines.append("**📌 Thông tin bổ sung:**")
+                lines.append("**Thông tin bổ sung:**")
                 info_lines = additional_info.split('\n')
                 for info_line in info_lines:
                     if info_line.strip():
@@ -436,7 +436,7 @@ def add_contact_suggestion(message: str) -> str:
     contact_info = get_contact_info()
     if contact_info and contact_info.get("fanpage"):
         contact_suggestion = (
-            f"\n\n💬 **Nếu câu hỏi chưa được giải đáp đầy đủ, bạn có thể liên hệ:**\n"
+            f"\n\n**Nếu câu hỏi chưa được giải đáp đầy đủ, bạn có thể liên hệ:**\n"
             f"   • **Fanpage:** {contact_info.get('fanpage')}\n"
             f"   • **Hotline:** {contact_info.get('hotline')}\n"
             f"   • **Email:** {contact_info.get('email')}"

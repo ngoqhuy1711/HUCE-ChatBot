@@ -156,7 +156,7 @@ def _handle_diem_chuan(major_info, year_info):
         formatted_text = format_data_to_text(results, "standard_score")
         year_label = year_info or "các năm gần đây"
         intro = (
-            f"✅ Mình tìm được {len(results)} kết quả điểm chuẩn của ngành {major_info} năm {year_label}."
+            f"Mình tìm được {len(results)} kết quả điểm chuẩn của ngành {major_info} năm {year_label}."
             if results
             else ""
         )
@@ -187,7 +187,7 @@ def _handle_diem_san(major_info, year_info):
         results = find_floor_score(major=major_info, year=year_info)
         formatted_text = format_data_to_text(results, "floor_score")
         intro = (
-            f"✅ Đây là thông tin điểm sàn mình tìm được cho ngành {major_info}."
+            f"Đây là thông tin điểm sàn mình tìm được cho ngành {major_info}."
             if results
             else ""
         )
@@ -218,7 +218,7 @@ def _handle_nganh_hoc(major_info):
         results = list_majors(major_info)
         formatted_text = format_data_to_text(results, "major_info")
         intro = (
-            f"✨ Đây là những thông tin nổi bật về ngành {major_info}."
+            f"Đây là những thông tin nổi bật về ngành {major_info}."
             if results
             else ""
         )
@@ -248,13 +248,13 @@ def _handle_hoc_phi(year_info):
     results = list_tuition(year=year_info)
     formatted_text = format_data_to_text(results, "tuition")
     if year_info:
-        intro = f"💰 Mình tổng hợp được mức học phí năm {year_info} như sau."
+        intro = f"Mình tổng hợp được mức học phí năm {year_info} như sau."
         empty_hint = (
             f"Mình chưa tìm thấy dữ liệu học phí cho năm {year_info}. "
             "Bạn thử hỏi mình về năm khác hoặc xem học phí chương trình cụ thể nhé."
         )
     else:
-        intro = "💰 Đây là thông tin học phí mới nhất mà mình có."
+        intro = "Đây là thông tin học phí mới nhất mà mình có."
         empty_hint = "Mình chưa có dữ liệu học phí để chia sẻ ngay lúc này."
     return _build_data_response(
         "tuition",
@@ -289,18 +289,18 @@ def _handle_hoc_bong():
     # Format text với phân loại
     formatted_lines = []
     if domestic_scholarships:
-        formatted_lines.append("### 🏛️ Học bổng trong nước (HUCE)")
+        formatted_lines.append("### Học bổng trong nước (HUCE)")
         formatted_lines.append("")
         formatted_lines.append(format_data_to_text(domestic_scholarships, "scholarships"))
 
     if international_scholarships:
-        formatted_lines.append("### 🌍 Học bổng quốc tế")
+        formatted_lines.append("### Học bổng quốc tế")
         formatted_lines.append("")
         formatted_lines.append(format_data_to_text(international_scholarships, "scholarships"))
 
     formatted_text = "\n".join(formatted_lines)
 
-    intro = f"🎁 Mình tìm thấy {len(results)} suất học bổng, bao gồm {len(domestic_scholarships)} học bổng trong nước và {len(international_scholarships)} học bổng quốc tế."
+    intro = f"Mình tìm thấy {len(results)} suất học bổng, bao gồm {len(domestic_scholarships)} học bổng trong nước và {len(international_scholarships)} học bổng quốc tế."
     empty_hint = "Hiện mình chưa có thông tin học bổng cập nhật. Bạn thử quay lại sau hoặc hỏi trực tiếp phòng tuyển sinh nhé."
 
     return _build_data_response(
@@ -327,7 +327,7 @@ def _handle_dieu_kien(entities, year_info):
     year_label = year_info or "2025"
     if phuong_thuc:
         intro = (
-            f"📌 Đây là điều kiện xét tuyển phương thức {phuong_thuc} năm {year_label}."
+            f"Đây là điều kiện xét tuyển phương thức {phuong_thuc} năm {year_label}."
             if results
             else ""
         )
@@ -337,7 +337,7 @@ def _handle_dieu_kien(entities, year_info):
         )
     else:
         intro = (
-            f"📌 Mình tổng hợp điều kiện xét tuyển chung năm {year_label} cho bạn đây."
+            f"Mình tổng hợp điều kiện xét tuyển chung năm {year_label} cho bạn đây."
             if results
             else ""
         )
@@ -363,7 +363,7 @@ def _handle_chi_tieu(major_info, year_info):
     year_label = year_info or "2025"
     if major_info:
         intro = (
-            f"🎯 Đây là chỉ tiêu tuyển sinh ngành {major_info} năm {year_label}."
+            f"Đây là chỉ tiêu tuyển sinh ngành {major_info} năm {year_label}."
             if results
             else ""
         )
@@ -373,7 +373,7 @@ def _handle_chi_tieu(major_info, year_info):
         )
     else:
         intro = (
-            f"🎯 Dưới đây là tổng quan chỉ tiêu tuyển sinh năm {year_label}."
+            f"Dưới đây là tổng quan chỉ tiêu tuyển sinh năm {year_label}."
             if results
             else ""
         )
@@ -402,7 +402,7 @@ def _handle_phuong_thuc(major_info, original_message):
         results = list_admission_methods_general()
         formatted_text = format_data_to_text(results, "admission_methods_general")
         intro = (
-            "📚 Đây là danh sách các phương thức xét tuyển hiện có của trường."
+            "Đây là danh sách các phương thức xét tuyển hiện có của trường."
             if results
             else ""
         )
@@ -418,7 +418,7 @@ def _handle_phuong_thuc(major_info, original_message):
     results = list_admission_methods(major=search_major)
     formatted_text = format_data_to_text(results, "admission_methods")
     intro = (
-        f"📚 Ngành {search_major} đang tuyển sinh theo những phương thức sau."
+        f"Ngành {search_major} đang tuyển sinh theo những phương thức sau."
         if results
         else ""
     )
@@ -450,7 +450,7 @@ def _handle_thoi_gian_dk(entities):
 
     if phuong_thuc:
         intro = (
-            f"🗓️ Đây là mốc thời gian dành cho phương thức {phuong_thuc}."
+            f"Đây là mốc thời gian dành cho phương thức {phuong_thuc}."
             if results
             else ""
         )
@@ -460,7 +460,7 @@ def _handle_thoi_gian_dk(entities):
         )
     else:
         intro = (
-            "🗓️ Đây là lịch trình tuyển sinh chung mà mình ghi nhận được."
+            "Đây là lịch trình tuyển sinh chung mà mình ghi nhận được."
             if results
             else ""
         )
@@ -570,7 +570,7 @@ def _handle_to_hop_mon(major_info):
                 else:
                     method_display = f"Phương thức {method_code}"
 
-                formatted_lines.append(f"   📋 **{method_display}:**")
+                formatted_lines.append(f"   **{method_display}:**")
 
                 for combo in sorted(combos):
                     if combo in combo_details:
@@ -590,7 +590,7 @@ def _handle_to_hop_mon(major_info):
             formatted_lines.append("")
 
     formatted_text = "\n".join(formatted_lines)
-    intro = f"📘 Các tổ hợp môn áp dụng cho ngành {major_info} đây nhé."
+    intro = f"Các tổ hợp môn áp dụng cho ngành {major_info} đây nhé."
     message = _compose_message(intro, formatted_text, DEFAULT_OUTRO)
 
     return {
@@ -605,7 +605,7 @@ def _handle_kenh_nop_ho_so():
     results = list_admissions_schedule()
     formatted_text = format_data_to_text(results, "admissions_schedule")
     intro = (
-        "📮 Đây là các kênh nộp hồ sơ tương ứng với từng giai đoạn tuyển sinh."
+        "Đây là các kênh nộp hồ sơ tương ứng với từng giai đoạn tuyển sinh."
         if results
         else ""
     )

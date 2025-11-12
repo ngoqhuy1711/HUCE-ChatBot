@@ -22,7 +22,7 @@ def input_box() -> rx.Component:
                     rx.input(
                         value=ChatState.input_value,
                         on_change=ChatState.handle_input_change,
-                        placeholder="💬 Nhập câu hỏi về tuyển sinh của bạn...",
+                        placeholder="Nhập câu hỏi về tuyển sinh của bạn...",
                         name="message",
                         size="2",
                         width="100%",
