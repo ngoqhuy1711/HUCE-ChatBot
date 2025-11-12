@@ -1,9 +1,0 @@
-method_code,abbreviation,method_name,description,requirements
-100,THPT,Xét tuyển sử dụng kết quả kỳ thi tốt nghiệp THPT,Xét tuyển dựa trên kết quả thi tốt nghiệp THPT năm 2025,Đạt ngưỡng đầu vào theo quy định
-100,THPT_NK,Xét tuyển THPT kết hợp thi năng khiếu,"Xét tuyển kết hợp kết quả THPT và thi môn năng khiếu (áp dụng cho Kiến trúc, Mỹ thuật, Quy hoạch)",Đạt ngưỡng đầu vào và điểm thi năng khiếu từ 12/20 trở lên
-200,HB,Xét học bạ THPT,Xét tuyển dựa trên kết quả học tập 3 năm THPT,"Tổng điểm trung bình 3 năm >= 18.0, không có môn nào dưới 5.5"
-402,TSA,Thi đánh giá tư duy - TSA,Xét tuyển sử dụng kết quả thi DGTD do ĐH Bách khoa Hà Nội tổ chức,Đạt điểm thi TSA theo yêu cầu
-402,SPT,Thi đánh giá năng lực - SPT,Xét tuyển sử dụng kết quả thi DGNL do ĐH Sư phạm Hà Nội tổ chức,Đạt điểm thi SPT theo yêu cầu
-417,VSAT,Thi đánh giá năng lực - V-SAT,Xét tuyển sử dụng kết quả thi V-SAT trên máy tính,Đạt điểm thi V-SAT theo yêu cầu
-415,CCQT,Chứng chỉ quốc tế,"Xét tuyển sử dụng chứng chỉ SAT, ACT",SAT >= 1200 hoặc ACT >= 26
-301,TT,Tuyển thẳng,Tuyển thẳng theo quy định của Bộ GDĐT,"Đạt giải trong các kỳ thi học sinh giỏi quốc gia/quốc tế, hoặc các đối tượng ưu tiên khác"
