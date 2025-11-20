@@ -7,7 +7,6 @@ from typing import Any, Dict
 from services.processors import (
     infer_major_from_message,
     find_standard_score,
-    find_floor_score,
     list_majors,
     list_tuition,
     list_scholarships,
@@ -99,7 +98,21 @@ def handle_intent_query(
         elif label in ["NAM_HOC", "NAM_TUYEN_SINH"]:
             year_info = text
 
-    # Nếu chưa có major_info, thử suy luận từ message gốc
+    # ========================================================================
+    # CONTEXT INFERENCE - Sử dụng context để điền thông tin thiếu
+    # ========================================================================
+    # Nếu không có major_info từ entities, thử lấy từ context
+    if not major_info and context:
+        # Lấy entities từ câu hỏi trước
+        last_entities = context.get("last_entities", [])
+        for entity in last_entities:
+            label = entity.get("label", "")
+            text = entity.get("text", "")
+            if label in ["MA_NGANH", "TEN_NGANH", "CHUYEN_NGANH"] and text:
+                major_info = text
+                break
+    
+    # Nếu vẫn chưa có major_info, thử suy luận từ message gốc
     if not major_info and original_message:
         inferred_major = infer_major_from_message(original_message)
         if inferred_major:
@@ -109,14 +122,12 @@ def handle_intent_query(
     if intent.startswith("hoi_diem_chuan"):
         return _handle_diem_chuan(major_info, year_info)
 
-    elif intent.startswith("hoi_diem_san"):
-        return _handle_diem_san(major_info, year_info)
 
     elif intent.startswith("hoi_nganh_hoc"):
         return _handle_nganh_hoc(major_info)
 
     elif intent.startswith("hoi_hoc_phi"):
-        return _handle_hoc_phi(year_info)
+        return _handle_hoc_phi(major_info, year_info)
 
     elif intent.startswith("hoi_hoc_bong"):
         return _handle_hoc_bong()
@@ -181,36 +192,6 @@ def _handle_diem_chuan(major_info, year_info):
         }
 
 
-def _handle_diem_san(major_info, year_info):
-    """Xử lý intent hỏi điểm sàn"""
-    if major_info:
-        results = find_floor_score(major=major_info, year=year_info)
-        formatted_text = format_data_to_text(results, "floor_score")
-        intro = (
-            f"Đây là thông tin điểm sàn mình tìm được cho ngành {major_info}."
-            if results
-            else ""
-        )
-        empty_hint = (
-            f"Điểm sàn của ngành {major_info} hiện chưa có sẵn. "
-            "Bạn thử hỏi mình về điểm chuẩn hoặc phương thức xét tuyển khác nhé."
-        )
-        return _build_data_response(
-            "floor_score",
-            results,
-            intro,
-            formatted_text,
-            empty_hint,
-        )
-    else:
-        return {
-            "type": "clarification",
-            "message": _compose_message(
-                "Bạn đang thắc mắc điểm sàn của ngành nào? Cho mình xin tên ngành để kiểm tra nhé.",
-                include_contact=True,
-            ),
-        }
-
 
 def _handle_nganh_hoc(major_info):
     """Xử lý intent hỏi thông tin ngành học"""
@@ -243,19 +224,37 @@ def _handle_nganh_hoc(major_info):
         }
 
 
-def _handle_hoc_phi(year_info):
-    """Xử lý intent hỏi học phí"""
+def _handle_hoc_phi(major_info, year_info):
+    """
+    Xử lý intent hỏi học phí
+
+    Args:
+        major_info: Tên ngành (từ entities hoặc context)
+        year_info: Năm học
+    """
     results = list_tuition(year=year_info)
     formatted_text = format_data_to_text(results, "tuition")
+
+    # Build intro message dựa trên thông tin có sẵn
+    intro_parts = ["Đây là thông tin học phí"]
+    if major_info:
+        intro_parts.append(f"cho ngành {major_info}")
     if year_info:
-        intro = f"Mình tổng hợp được mức học phí năm {year_info} như sau."
+        intro_parts.append(f"năm {year_info}")
+    intro = " ".join(intro_parts) + " mà mình tìm được."
+
+    # Empty hint
+    if major_info or year_info:
         empty_hint = (
-            f"Mình chưa tìm thấy dữ liệu học phí cho năm {year_info}. "
-            "Bạn thử hỏi mình về năm khác hoặc xem học phí chương trình cụ thể nhé."
+            f"Mình chưa tìm thấy dữ liệu học phí "
+            f"{'cho ngành ' + major_info if major_info else ''}"
+            f"{' năm ' + year_info if year_info else ''}. "
+            "Bạn thử hỏi về học phí chung hoặc năm khác nhé."
         )
     else:
         intro = "Đây là thông tin học phí mới nhất mà mình có."
         empty_hint = "Mình chưa có dữ liệu học phí để chia sẻ ngay lúc này."
+
     return _build_data_response(
         "tuition",
         results,
@@ -314,37 +313,13 @@ def _handle_hoc_bong():
 
 def _handle_dieu_kien(entities, year_info):
     """Xử lý intent hỏi điều kiện xét tuyển"""
-    phuong_thuc = None
-    for entity in entities:
-        label = entity.get("label", "")
-        if label == "PHUONG_THUC":
-            phuong_thuc = entity.get("text", "")
-            break
-
-    results = list_admission_conditions(phuong_thuc=phuong_thuc, year=year_info)
+    # Điều kiện xét tuyển là chung cho tất cả phương thức
+    results = list_admission_conditions()
     formatted_text = format_data_to_text(results, "admission_conditions")
-
+    
     year_label = year_info or "2025"
-    if phuong_thuc:
-        intro = (
-            f"Đây là điều kiện xét tuyển phương thức {phuong_thuc} năm {year_label}."
-            if results
-            else ""
-        )
-        empty_hint = (
-            f"Hiện mình chưa tìm được điều kiện cho phương thức {phuong_thuc} năm {year_label}. "
-            "Bạn thử kiểm tra lại tên phương thức hoặc hỏi mình về năm khác nhé."
-        )
-    else:
-        intro = (
-            f"Mình tổng hợp điều kiện xét tuyển chung năm {year_label} cho bạn đây."
-            if results
-            else ""
-        )
-        empty_hint = (
-            f"Mình chưa thấy dữ liệu điều kiện xét tuyển năm {year_label}. "
-            "Bạn thử hỏi cụ thể theo phương thức để mình tra cứu chính xác hơn nhé."
-        )
+    intro = f"Dưới đây là các điều kiện xét tuyển của trường năm {year_label}:" if results else ""
+    empty_hint = "Hiện mình chưa có thông tin về điều kiện xét tuyển."
 
     return _build_data_response(
         "admission_conditions",

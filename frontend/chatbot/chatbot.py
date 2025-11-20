@@ -20,20 +20,57 @@ from chatbot.state import ChatState
 # GLOBAL STYLES
 # ============================================================================
 
-# CSS reset để fix layout full screen
+# Modern font stack với fallbacks
+FONT_FAMILY = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif"
+
+# CSS reset với enhanced typography
 global_style = {
     "body": {
         "margin": "0",
         "padding": "0",
         "overflow": "hidden",
-        "font-family": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
+        "font-family": FONT_FAMILY,
+        "font-size": "16px",
+        "-webkit-font-smoothing": "antialiased",
+        "-moz-osx-font-smoothing": "grayscale",
+        "text-rendering": "optimizeLegibility",
     },
     "#root": {
         "width": "100vw",
         "height": "100vh",
         "overflow": "hidden",
     },
+    # Import Inter font from Google Fonts
+    "@import": "url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap')",
 }
+
+# Script để auto-detect theme từ browser
+THEME_DETECT_SCRIPT = """
+<script>
+(function() {
+    // Check if browser supports prefers-color-scheme
+    if (window.matchMedia) {
+        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        // Set initial theme
+        const initialTheme = darkModeQuery.matches ? 'dark' : 'light';
+        
+        // Trigger theme change in Reflex state
+        if (window._update_theme) {
+            window._update_theme(initialTheme);
+        }
+        
+        // Listen for changes
+        darkModeQuery.addEventListener('change', (e) => {
+            const newTheme = e.matches ? 'dark' : 'light';
+            if (window._update_theme) {
+                window._update_theme(newTheme);
+            }
+        });
+    }
+})();
+</script>
+"""
 
 
 # ============================================================================
@@ -41,8 +78,8 @@ global_style = {
 # ============================================================================
 
 # Metadata cho app
-app_name = "Chatbot Tuyển sinh HUCE"
-app_description = "Chatbot tư vấn tuyển sinh Đại học Xây dựng Hà Nội"
+app_name = "Tra cứu thông tin tuyển sinh HUCE"
+app_description = "Chatbot hỗ trợ tra cứu thông tin tuyển sinh Đại học Xây dựng Hà Nội"
 
 
 # ============================================================================
@@ -56,7 +93,42 @@ def index() -> rx.Component:
     Returns:
         rx.Component - Chat interface
     """
-    return chat_interface()
+    return rx.fragment(
+        # Script để auto-detect theme
+        rx.script("""
+            // Auto-detect theme từ browser preference
+            (function() {
+                if (window.matchMedia) {
+                    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                    
+                    // Set initial theme
+                    const setTheme = (isDark) => {
+                        // Trigger Reflex state update
+                        const theme = isDark ? 'dark' : 'light';
+                        console.log('Browser theme detected:', theme);
+                        
+                        // Try to update Reflex state if available
+                        if (window.setTheme) {
+                            window.setTheme(theme);
+                        }
+                        
+                        // Store in localStorage as fallback
+                        localStorage.setItem('theme', theme);
+                    };
+                    
+                    // Set initial theme
+                    setTheme(darkModeQuery.matches);
+                    
+                    // Listen for changes
+                    darkModeQuery.addEventListener('change', (e) => {
+                        setTheme(e.matches);
+                    });
+                }
+            })();
+        """),
+
+        chat_interface(),
+    )
 
 
 # ============================================================================

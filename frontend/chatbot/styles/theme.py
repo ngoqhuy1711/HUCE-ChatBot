@@ -25,84 +25,94 @@ Sử dụng:
 HUCE_PRIMARY = "#0052CC"
 HUCE_SECONDARY = "#2563EB"
 
-# Light Mode Colors
+# ============================================================================
+# COLORS - Modern Vibrant Palette (Light & Dark Mode)
+# ============================================================================
+# HUCE Colors - Enhanced
+HUCE_PRIMARY = "#0052CC"
+HUCE_SECONDARY = "#2563EB"
+HUCE_ACCENT = "#3b82f6"
+
+# Light Mode Colors - Fresh & Vibrant
 LIGHT_COLORS = {
-    # Primary HUCE colors
+    # Primary colors
     "primary": HUCE_PRIMARY,
     "secondary": HUCE_SECONDARY,
-    
-    # Background colors (flat, neutral)
-    "bg_app": "#f6f7fb",
+    "accent": HUCE_ACCENT,
+
+    # Background colors - Clean & Bright
+    "bg_app": "#f8fafc",
     "bg_sidebar": "#ffffff",
-    "bg_header": "#ffffff",
-    "bg_chat": "#f6f7fb",
-    "bg_input_container": "#ffffff",
-    "bg_input": "#f8fafc",
+    "bg_header": "rgba(255, 255, 255, 0.98)",
+    "bg_chat": "#f8fafc",
+    "bg_input_container": "rgba(255, 255, 255, 0.98)",
+    "bg_input": "#ffffff",
     "bg_input_focus": "#ffffff",
-    "bg_user_msg": "#0b63e6",  # solid primary for user bubble
-    "bg_bot_msg": "#ffffff",
+    "bg_user_msg": "linear-gradient(135deg, #0052CC 0%, #1e40af 50%, #3b82f6 100%)",
+    "bg_bot_msg": "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
     "bg_feature_card": "#ffffff",
     "bg_suggestion": "#ffffff",
     
-    # Text colors
-    "text_primary": "#111827",
-    "text_secondary": "#6b7280",
-    "text_sidebar": "#111827",
+    # Text colors - High Contrast
+    "text_primary": "#0f172a",
+    "text_secondary": "#64748b",
+    "text_sidebar": "#1e293b",
     "text_user_msg": "#ffffff",
-    "text_bot_msg": "#111827",
-    "text_input": "#111827",
-    "text_placeholder": "#9ca3af",
-    
-    # Border colors (subtle)
-    "border_header": "#e5e7eb",
-    "border_input": "#d1d5db",
+    "text_bot_msg": "#1e293b",
+    "text_input": "#1e293b",
+    "text_placeholder": "#94a3b8",
+
+    # Border colors - Subtle with Accent
+    "border_header": "rgba(226, 232, 240, 0.8)",
+    "border_input": "#cbd5e1",
     "border_input_focus": HUCE_PRIMARY,
-    "border_bot_msg": "#e5e7eb",
-    "border_feature_card": "#e5e7eb",
-    "border_suggestion": "#e5e7eb",
-    
+    "border_bot_msg": "rgba(0, 82, 204, 0.15)",
+    "border_feature_card": "rgba(0, 82, 204, 0.1)",
+    "border_suggestion": "#e2e8f0",
+
     # Icon colors
-    "icon_sidebar": "#374151",
+    "icon_sidebar": "#475569",
 }
 
-# Dark Mode Colors
+# Dark Mode Colors - Rich & Comfortable
 DARK_COLORS = {
-    # Primary HUCE colors (slightly brighter for contrast)
-    "primary": "#4f8df6",
-    "secondary": "#7aa8ff",
-    
-    # Background colors (flat)
-    "bg_app": "#0f172a",
+    # Primary colors (brighter for contrast)
+    "primary": "#3b82f6",
+    "secondary": "#60a5fa",
+    "accent": "#93c5fd",
+
+    # Background colors - Deep & Rich
+    "bg_app": "#0a0f1e",
     "bg_sidebar": "#0f172a",
-    "bg_header": "#111827",
-    "bg_chat": "#0f172a",
-    "bg_input_container": "#111827",
-    "bg_input": "#0b1222",
-    "bg_input_focus": "#111827",
-    "bg_user_msg": "#1e3a8a",  # deep solid for user bubble
-    "bg_bot_msg": "#1f2937",
-    "bg_feature_card": "#111827",
-    "bg_suggestion": "#111827",
-    
-    # Text colors
-    "text_primary": "#f3f4f6",
-    "text_secondary": "#9ca3af",
-    "text_sidebar": "#f3f4f6",
+    "bg_header": "rgba(15, 23, 42, 0.98)",
+    "bg_chat": "#0a0f1e",
+    "bg_input_container": "rgba(15, 23, 42, 0.98)",
+    "bg_input": "#1e293b",
+    "bg_input_focus": "#1e293b",
+    "bg_user_msg": "linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)",
+    "bg_bot_msg": "linear-gradient(145deg, #1f2937 0%, #1a202e 100%)",
+    "bg_feature_card": "#1e293b",
+    "bg_suggestion": "#1e293b",
+
+    # Text colors - Soft & Readable
+    "text_primary": "#f1f5f9",
+    "text_secondary": "#cbd5e1",  # Sáng hơn từ #94a3b8 - dễ nhìn hơn
+    "text_sidebar": "#e2e8f0",
     "text_user_msg": "#ffffff",
-    "text_bot_msg": "#f3f4f6",
-    "text_input": "#f3f4f6",
-    "text_placeholder": "#6b7280",
-    
-    # Border colors (subtle)
-    "border_header": "#1f2937",
-    "border_input": "#293241",
-    "border_input_focus": "#4f8df6",
-    "border_bot_msg": "#293241",
-    "border_feature_card": "#1f2937",
-    "border_suggestion": "#1f2937",
-    
+    "text_bot_msg": "#e5e7eb",
+    "text_input": "#f1f5f9",
+    "text_placeholder": "#94a3b8",  # Sáng hơn từ #64748b - rõ ràng hơn
+
+    # Border colors - Visible with Glow
+    "border_header": "rgba(30, 41, 59, 0.8)",
+    "border_input": "#334155",
+    "border_input_focus": "#3b82f6",
+    "border_bot_msg": "rgba(59, 130, 246, 0.2)",
+    "border_feature_card": "rgba(59, 130, 246, 0.15)",
+    "border_suggestion": "#334155",
+
     # Icon colors
-    "icon_sidebar": "#f3f4f6",
+    "icon_sidebar": "#94a3b8",
 }
 
 # Legacy COLORS (deprecated - keep for compatibility)

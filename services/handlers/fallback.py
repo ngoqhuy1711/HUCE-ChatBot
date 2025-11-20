@@ -45,11 +45,11 @@ def handle_fallback_query(message: str, context: Dict[str, Any]) -> Dict[str, An
             ),
         }
 
-    elif any(word in message_lower for word in ["điểm", "chuẩn", "sàn"]):
+    elif any(word in message_lower for word in ["điểm", "chuẩn"]):
         return {
             "type": "score_help",
             "message": _message_with_contact(
-                'Bạn có thể hỏi về điểm chuẩn hoặc điểm sàn của từng ngành. '
+                'Bạn có thể hỏi về điểm chuẩn của từng ngành. '
                 'Ví dụ: "Điểm chuẩn ngành Kiến trúc năm 2025" hoặc "Ngành CNTT lấy bao nhiêu điểm?"',
                 DEFAULT_GUIDE,
             ),

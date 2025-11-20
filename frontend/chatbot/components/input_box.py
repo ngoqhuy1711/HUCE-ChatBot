@@ -39,13 +39,13 @@ def input_box() -> rx.Component:
                                 DARK_COLORS["bg_input"],
                                 LIGHT_COLORS["bg_input"],
                             ),
-                            "border-radius": "12px",
-                            
-                            # Font tối giản, dễ đọc
-                            "font-size": "1rem",
-                            "padding": "0.85rem 1rem",
-                            "height": "52px",
-                            
+                            "border-radius": "16px",
+
+                            # Font size lớn hơn
+                            "font-size": "1.05rem",
+                            "padding": "1rem 1.25rem",
+                            "height": "56px",
+
                             # Color
                             "color": rx.cond(
                                 ChatState.theme_mode == "dark",
@@ -56,14 +56,15 @@ def input_box() -> rx.Component:
                             # Animation nhẹ
                             "transition": "border-color 0.2s, box-shadow 0.2s, background 0.2s",
                             
-                            # Placeholder
+                            # Placeholder với contrast tốt hơn
                             "&::placeholder": {
                                 "color": rx.cond(
                                     ChatState.theme_mode == "dark",
-                                    DARK_COLORS["text_placeholder"],
-                                    LIGHT_COLORS["text_placeholder"],
+                                    "#cbd5e1",  # Light slate - sáng hơn cho dark mode
+                                    "#475569",  # Dark slate - tối hơn cho light mode
                                 ),
                                 "font-size": "0.95rem",
+                                "opacity": "0.8",  # Thêm opacity để softer
                             },
                             
                             # Focus state tinh gọn
@@ -102,37 +103,34 @@ def input_box() -> rx.Component:
                         },
                     ),
                     
-                    # Send button - tối giản
+                    # Send button với vibrant gradient
                     rx.button(
                         rx.cond(
                             ChatState.is_loading,
                             rx.spinner(size="3", color="white"),
-                            rx.icon("send", size=20, color="white"),
+                            rx.icon("send", size=22, color="white"),
                         ),
                         
                         type="submit",
                         
-                        width="52px",
-                        height="52px",
+                        width="56px",
+                        height="56px",
                         padding="0",
-                        background=rx.cond(
-                            ChatState.theme_mode == "dark",
-                            DARK_COLORS["primary"],
-                            LIGHT_COLORS["primary"],
-                        ),
+                        background="linear-gradient(135deg, #0052CC 0%, #2563eb 100%)",
                         border="none",
-                        border_radius="12px",
+                        border_radius="16px",
                         cursor="pointer",
-                        box_shadow="0 2px 8px rgba(0,0,0,0.08)",
-                        transition="transform 0.15s ease, box-shadow 0.2s ease",
-                        
+                        box_shadow="0 4px 12px rgba(0, 82, 204, 0.3)",
+                        transition="all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
+
                         _hover={
-                            "transform": "translateY(-1px)",
-                            "box_shadow": "0 6px 16px rgba(0,0,0,0.12)",
+                            "transform": "translateY(-2px) scale(1.05)",
+                            "box_shadow": "0 8px 20px rgba(0, 82, 204, 0.4)",
+                            "background": "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)",
                         },
                         
                         _active={
-                            "transform": "translateY(0)",
+                            "transform": "translateY(0) scale(0.98)",
                         },
                         
                         disabled=ChatState.is_loading,
@@ -150,18 +148,19 @@ def input_box() -> rx.Component:
                 justify_content="center",
             ),
             
-            # Footer text - tối giản
+            # Footer text với better typography
             rx.text(
-                "Nhấn Enter để gửi",
-                font_size="0.9rem",
+                "Nhấn Enter để gửi • Powered by HUCE AI",
+                font_size="0.875rem",
                 font_weight="500",
                 color=rx.cond(
                     ChatState.theme_mode == "dark",
-                    DARK_COLORS["text_secondary"],
-                    LIGHT_COLORS["text_secondary"],
+                    "#64748b",
+                    "#94a3b8",
                 ),
                 text_align="center",
                 margin_top=SPACING_REM["md"],
+                letter_spacing="-0.01em",
             ),
             
             width="100%",

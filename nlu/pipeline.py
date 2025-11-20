@@ -71,6 +71,13 @@ def _load_synonyms(path: str) -> Dict[str, str]:
     """
     Load từ điển từ đồng nghĩa từ file CSV
 
+    Format CSV: entity,canonical,alias
+    - entity: Loại entity (MAJOR, METHOD, PROGRAM, etc.)
+    - canonical: Tên chuẩn (ví dụ: "Công nghệ thông tin")
+    - alias: Từ viết tắt/đồng nghĩa (ví dụ: "CNTT", "IT")
+
+    Mapping: alias (normalized) -> canonical (normalized)
+
     Args:
         path: Đường dẫn file synonym.csv
 
@@ -83,14 +90,32 @@ def _load_synonyms(path: str) -> Dict[str, str]:
 
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
-        _ = next(reader, None)  # Skip header
+        header = next(reader, None)  # Skip header
+
         for row in reader:
-            if len(row) < 2:
+            # Skip comment lines và empty lines
+            if not row or (row[0] and row[0].strip().startswith('#')):
                 continue
-            src = _normalize_text(row[0])  # Từ gốc
-            dst = _normalize_text(row[1])  # Từ chuẩn
-            if src and dst:
-                mapping[src] = dst
+
+            if len(row) < 3:
+                continue
+
+            entity = row[0].strip()
+            canonical = row[1].strip()
+            alias = row[2].strip()
+
+            # Skip header duplicates
+            if entity == "entity" or not alias or not canonical:
+                continue
+
+            # Normalize cả 2 để mapping đúng
+            alias_norm = _normalize_text(alias)
+            canonical_norm = _normalize_text(canonical)
+
+            if alias_norm and canonical_norm:
+                # Map: alias -> canonical
+                mapping[alias_norm] = canonical_norm
+
     return mapping
 
 
@@ -132,7 +157,6 @@ class NLPPipeline:
         # Cần CẢ 2 versions: có dấu VÀ không dấu (vì user có thể nhập cả 2 cách)
         self.intent_keyword_backoff: Dict[str, str] = {
             # Có dấu
-            "điểm sàn": "hoi_diem_san",
             "điểm chuẩn": "hoi_diem_chuan",
             "chỉ tiêu": "hoi_chi_tieu",
             "học phí": "hoi_hoc_phi",
@@ -145,7 +169,6 @@ class NLPPipeline:
             "tổ hợp": "hoi_to_hop_mon",
             "khối thi": "hoi_khoi_thi",
             # Không dấu (cho trường hợp user nhập không dấu)
-            "diem san": "hoi_diem_san",
             "diem chuan": "hoi_diem_chuan",
             "chi tieu": "hoi_chi_tieu",
             "hoc phi": "hoi_hoc_phi",
@@ -204,7 +227,7 @@ class NLPPipeline:
             else None
         )
         self._entity_extractor = (
-            EntityExtractor(self.data_dir, os.path.join(data_dir, "entity.json"))
+            EntityExtractor(self.data_dir, os.path.join(data_dir, "entity.json"), self.syn_map)
             if EntityExtractor
             else None
         )
@@ -289,24 +312,52 @@ class NLPPipeline:
         # Trích xuất entities
         entities = self.extract_entities(text)
 
-        # Heuristic: Nếu phát hiện ngành học trong câu hỏi ngắn và không có intent rõ ràng
-        # thì mặc định là hỏi về ngành học
-        if intent == "fallback" and entities:
-            # Kiểm tra xem có entity TEN_NGANH không
-            has_major = any(e.get("label") == "TEN_NGANH" for e in entities)
+        # Heuristic: Override intent detection nếu phát hiện câu hỏi rõ ràng về ngành học
+        # Áp dụng khi:
+        # 1. Intent hiện tại không chắc chắn (fallback, tro_giup, hoặc score thấp)
+        # 2. Phát hiện entity ngành học + từ khóa giới thiệu/tìm hiểu
+        norm_text = _normalize_text(text)
+
+        # Các intent có thể bị nhầm với hỏi ngành học
+        uncertain_intents = ["fallback", "tro_giup", "chao_hoi"]
+        is_uncertain = intent in uncertain_intents or score < (self.intent_threshold + 0.15)
+
+        if is_uncertain and entities:
+            # Kiểm tra xem có entity TEN_NGANH hoặc CHUYEN_NGANH không
+            has_major = any(e.get("label") in ["TEN_NGANH", "CHUYEN_NGANH"] for e in entities)
             # Kiểm tra xem câu hỏi có chứa từ "ngành" hoặc "nganh"
-            norm_text = _normalize_text(text)
             has_nganh_keyword = "nganh" in norm_text
 
             # KHÔNG áp dụng heuristic nếu có các từ khóa specific khác
-            # như "mã", "điểm", "học phí", etc.
-            exclusion_keywords = ["ma ", " ma", "diem", "hoc phi", "chi tieu"]
+            # như "mã ngành", "điểm", "học phí", "chỉ tiêu", "tổ hợp"
+            # Bao gồm CẢ version có dấu VÀ không dấu
+            exclusion_keywords = [
+                # Mã ngành
+                "ma nganh", "mã ngành", "ma ", " ma",
+                # Điểm
+                "diem chuan", "điểm chuẩn", "diem ", "điểm ",
+                # Học phí
+                "hoc phi", "học phí", "tien hoc", "tiền học", "chi phi", "chi phí",
+                # Chỉ tiêu
+                "chi tieu", "chỉ tiêu", "tuyen sinh", "tuyển sinh", "tuyen", "tuyển",
+                # Tổ hợp môn
+                "to hop", "tổ hợp", "khoi thi", "khối thi", "mon thi", "môn thi",
+                # Phương thức
+                "phuong thuc", "phương thức", "xet tuyen", "xét tuyển"
+            ]
             has_exclusion = any(kw in norm_text for kw in exclusion_keywords)
 
-            # Nếu có tên ngành HOẶC có từ "ngành" trong câu ngắn (< 50 ký tự)
+            # Từ khóa chỉ ra intent hỏi về ngành học
+            major_intro_keywords = [
+                "gioi thieu", "tim hieu", "mo ta", "la gi", "hoc gi",
+                "ve nganh", "thong tin ve", "cho biet ve", "muon biet"
+            ]
+            has_intro_keyword = any(kw in norm_text for kw in major_intro_keywords)
+
+            # Nếu có tên ngành HOẶC (có từ "ngành" + có từ khóa giới thiệu)
             # và KHÔNG có từ khóa exclusion thì cho là hỏi về ngành học
-            if (has_major or has_nganh_keyword) and len(text.strip()) < 50 and not has_exclusion:
+            if (has_major or (has_nganh_keyword and has_intro_keyword)) and not has_exclusion:
                 intent = "hoi_nganh_hoc"
-                score = self.intent_threshold + 0.05  # Đảm bảo vượt ngưỡng
+                score = self.intent_threshold + 0.15  # Đảm bảo vượt ngưỡng rõ ràng
 
         return {"intent": intent, "score": score, "entities": entities}

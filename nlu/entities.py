@@ -122,15 +122,17 @@ class EntityExtractor:
     3. NER từ Underthesea
     """
 
-    def __init__(self, data_dir: str, patterns_path: str) -> None:
+    def __init__(self, data_dir: str, patterns_path: str, synonym_map: Dict[str, str] = None) -> None:
         """
         Khởi tạo Entity Extractor
 
         Args:
             data_dir: Thư mục chứa dữ liệu CSV
             patterns_path: Đường dẫn file entity.json
+            synonym_map: Dict mapping từ đồng nghĩa -> từ chuẩn (optional)
         """
         self.data_dir = data_dir
+        self.synonym_map = synonym_map or {}
 
         # Load patterns từ entity.json
         self.entity_patterns: List[Tuple[str, str]] = _load_entity_patterns(
@@ -486,6 +488,9 @@ class EntityExtractor:
         """
         Trích xuất entity bằng dictionary lookup từ CSV
 
+        Hỗ trợ synonym expansion: nếu text chứa synonym (vd: "cntt"),
+        sẽ tìm kiếm cả canonical form (vd: "công nghệ thông tin")
+
         Args:
             norm_text: Văn bản đã được normalize
 
@@ -493,9 +498,37 @@ class EntityExtractor:
             List các entity được tìm thấy
         """
         found: List[Dict[str, Any]] = []
+
+        # Bước 1: Tìm kiếm trực tiếp trong text
         for label, phrase in self.dict_phrases:
             if phrase and phrase in norm_text:
                 found.append({"label": label, "text": phrase, "source": "dictionary"})
+
+        # Bước 2: Expand synonyms và tìm kiếm lại
+        # Tokenize text và thay thế synonyms
+        tokens = norm_text.split()
+        expanded_tokens = []
+
+        for token in tokens:
+            # Nếu token là synonym, lấy canonical form
+            canonical = self.synonym_map.get(token, token)
+            expanded_tokens.append(canonical)
+
+        # Tạo expanded text
+        expanded_text = " ".join(expanded_tokens)
+
+        # Tìm kiếm trong expanded text (nếu khác với original)
+        if expanded_text != norm_text:
+            for label, phrase in self.dict_phrases:
+                if phrase and phrase in expanded_text:
+                    # Check xem đã tìm thấy chưa
+                    already_found = any(
+                        e["label"] == label and e["text"] == phrase
+                        for e in found
+                    )
+                    if not already_found:
+                        found.append({"label": label, "text": phrase, "source": "dictionary"})
+
         return found
 
     def extract(self, text: str) -> List[Dict[str, Any]]:
@@ -529,10 +562,8 @@ class EntityExtractor:
             # Chuẩn hóa label (alias mapping)
             canon_label = self.entity_label_alias.get(raw_label, raw_label)
 
-            # Xử lý đặc biệt cho điểm sàn/chuẩn
-            if "điểm sàn" in norm_t:
-                canon_label = "DIEM_SAN"
-            elif "điểm chuẩn" in norm_t:
+            # Xử lý đặc biệt cho điểm chuẩn
+            if "điểm chuẩn" in norm_t:
                 canon_label = "DIEM_CHUAN"
 
             # Deduplication

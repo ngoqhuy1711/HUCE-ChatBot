@@ -188,7 +188,7 @@ def format_data_to_text(data: List[Dict[str, Any]], data_type: str) -> str:
             lines.append("")
 
     elif data_type == "floor_score":
-        lines.append("Thông tin điểm sàn hiện không có sẵn.")
+        lines.append("Thông tin hiện không có sẵn.")
 
     elif data_type == "scholarships":
         for idx, item in enumerate(data, 1):
@@ -242,11 +242,17 @@ def format_data_to_text(data: List[Dict[str, Any]], data_type: str) -> str:
                 lines.append("")
 
     elif data_type == "admission_conditions":
+        # Điều kiện xét tuyển chung
         for idx, item in enumerate(data, 1):
-            lines.append(f"**{idx}. {item.get('admission_method', 'N/A')}**")
-            lines.append(f"   • **Điều kiện:** {item.get('requirements', 'N/A')}")
-            if item.get('nam'):
-                lines.append(f"   • **Năm:** {item.get('nam')}")
+            condition_name = item.get('condition_name', 'N/A')
+            description = item.get('description', 'N/A')
+            is_required = item.get('is_required', '')
+            
+            # Format điều kiện
+            required_text = " (Bắt buộc)" if is_required.lower() in ['có', 'yes', 'true', '1'] else ""
+            
+            lines.append(f"**{idx}. {condition_name}**{required_text}")
+            lines.append(f"   • {description}")
             lines.append("")
 
     elif data_type == "admission_quota":

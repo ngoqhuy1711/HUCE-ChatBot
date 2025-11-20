@@ -97,7 +97,6 @@ from .processors.majors import list_majors
 # Scores functions
 from .processors.scores import (
     find_standard_score,
-    find_floor_score,
     suggest_majors_by_score,
 )
 # Utility functions
@@ -162,7 +161,6 @@ __all__ = [
     "list_majors",
     # Scores
     "find_standard_score",
-    "find_floor_score",
     "suggest_majors_by_score",
     # Admissions
     "list_admission_conditions",

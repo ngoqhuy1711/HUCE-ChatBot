@@ -96,25 +96,6 @@ def find_standard_score(
 
     return results
 
-
-def find_floor_score(
-        major: Optional[str] = None, year: Optional[str] = None
-) -> List[Dict[str, Any]]:
-    """
-    Tìm kiếm điểm sàn (theo ngành và/hoặc năm học)
-    
-    NOTE: File floor_score.csv đã được xóa. Hàm này trả về empty list để tương thích ngược.
-    
-    Args:
-        major: Tên hoặc mã ngành
-        year: Năm học
-
-    Returns:
-        List điểm sàn (trả về empty list)
-    """
-    return []
-
-
 def suggest_majors_by_score(request_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Gợi ý ngành học dựa trên điểm số hoặc chứng chỉ

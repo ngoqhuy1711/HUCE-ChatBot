@@ -13,37 +13,32 @@ def list_admission_conditions(
         phuong_thuc: Optional[str] = None, year: Optional[str] = None
 ) -> List[Dict[str, Any]]:
     """
-    Tìm kiếm điều kiện xét tuyển (lọc theo phương thức và/hoặc năm)
-
+    Lấy danh sách điều kiện xét tuyển chung
+    
     Args:
-        phuong_thuc: Phương thức xét tuyển (THPT, học bạ, TSA, etc.)
-        year: Năm học
-
+        phuong_thuc: (Không sử dụng - điều kiện chung cho tất cả phương thức)
+        year: (Không sử dụng - điều kiện chung)
+    
     Returns:
-        List điều kiện xét tuyển phù hợp
+        List điều kiện xét tuyển chung
     """
     rows = read_csv(os.path.join(DATA_DIR, "admission_conditions.csv"))
     results: List[Dict[str, Any]] = []
-
+    
     for r in rows:
-        nam = (r.get("nam") or "").strip()
-        pt = (r.get("admission_method") or "").strip()
-
-        # Lọc theo năm nếu có
-        if year and year not in nam:
-            continue
-
-        # Lọc theo phương thức nếu có
-        if phuong_thuc and phuong_thuc.lower() not in pt.lower():
-            continue
-
-        results.append(
-            {
-                "nam": nam,
-                "admission_method": pt,
-                "requirements": r.get("requirements"),
-            }
-        )
+        condition_name = (r.get("condition_name") or "").strip()
+        description = (r.get("description") or "").strip()
+        is_required = (r.get("is_required") or "").strip()
+        
+        if condition_name and description:
+            results.append(
+                {
+                    "condition_name": condition_name,
+                    "description": description,
+                    "is_required": is_required,
+                }
+            )
+    
     return results
 
 

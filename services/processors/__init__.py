@@ -5,7 +5,7 @@ Module này chứa các processors xử lý dữ liệu từ CSV files:
 - Cache: Caching mechanism cho CSV
 - Utils: Text normalization và formatting
 - Majors: Xử lý thông tin ngành học
-- Scores: Xử lý điểm chuẩn, điểm sàn
+- Scores: Xử lý điểm chuẩn
 - Admissions: Xử lý thông tin xét tuyển
 - Academic: Xử lý học phí và học bổng
 - Contact: Xử lý thông tin liên hệ
@@ -26,7 +26,7 @@ from .cache import read_csv, clear_cache
 from .cefr import get_cefr_conversion, convert_certificate_score
 from .contact import get_contact_info
 from .majors import list_majors
-from .scores import find_standard_score, find_floor_score, suggest_majors_by_score
+from .scores import find_standard_score, suggest_majors_by_score
 from .utils import (
     strip_diacritics,
     normalize_text,

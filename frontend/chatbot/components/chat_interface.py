@@ -43,7 +43,7 @@ def sidebar() -> rx.Component:
                     text_align="center",
                 ),
                 rx.text(
-                    "Chatbot tư vấn tuyển sinh",
+                    "Tra cứu thông tin tuyển sinh",
                     font_size="0.85rem",
                     color=rx.cond(
                         ChatState.theme_mode == "dark",
@@ -59,7 +59,15 @@ def sidebar() -> rx.Component:
             
             # New conversation button tinh gọn
             rx.button(
-                rx.text("Cuộc hội thoại mới", font_weight="600"),
+                rx.text(
+                    "Cuộc hội thoại mới",
+                    font_weight="600",
+                    color=rx.cond(
+                        ChatState.theme_mode == "dark",
+                        DARK_COLORS["text_primary"],
+                        LIGHT_COLORS["text_primary"],
+                    ),
+                ),
                 on_click=ChatState.reset_conversation,
                 width="100%",
                 padding=SPACING_REM["sm"],
@@ -218,14 +226,14 @@ def sidebar() -> rx.Component:
 
 
 def header() -> rx.Component:
-    """Header tối giản với title và theme toggle."""
+    """Header compact với title và theme toggle."""
     return rx.box(
         rx.hstack(
-            # Title
+            # Title - compact hơn
             rx.vstack(
                 rx.text(
-                    "Trợ lý tuyển sinh HUCE",
-                    font_size="1.25rem",
+                    "Chatbot Tuyển sinh HUCE 2025",
+                    font_size="1.15rem",
                     font_weight="600",
                     color=rx.cond(
                         ChatState.theme_mode == "dark",
@@ -234,15 +242,15 @@ def header() -> rx.Component:
                     ),
                 ),
                 rx.text(
-                    "Hỏi về ngành, điểm, điều kiện, học phí,…",
-                    font_size="0.95rem",
+                    "Hệ thống tra cứu thông tin tuyển sinh 24/7",
+                    font_size="0.875rem",
                     color=rx.cond(
                         ChatState.theme_mode == "dark",
                         DARK_COLORS["text_secondary"],
                         LIGHT_COLORS["text_secondary"],
                     ),
                 ),
-                spacing="0",
+                spacing="1",
                 align_items="flex-start",
             ),
             
@@ -253,28 +261,28 @@ def header() -> rx.Component:
             rx.button(
                 rx.cond(
                     ChatState.theme_mode == "dark",
-                    rx.icon("sun", size=18),
-                    rx.icon("moon", size=18),
+                    rx.icon("sun", size=16),
+                    rx.icon("moon", size=16),
                 ),
                 on_click=ChatState.toggle_theme,
                 
-                width="40px",
-                height="40px",
+                width="36px",
+                height="36px",
                 padding="0",
                 background=rx.cond(
                     ChatState.theme_mode == "dark",
-                    "rgba(255,255,255,0.06)",
-                    "rgba(0,0,0,0.04)",
+                    "rgba(255,255,255,0.08)",
+                    "rgba(0,0,0,0.05)",
                 ),
-                border_radius="10px",
+                border_radius="8px",
                 cursor="pointer",
-                transition="all 0.3s",
+                transition="all 0.2s",
                 
                 _hover={
                     "background": rx.cond(
                         ChatState.theme_mode == "dark",
-                        "rgba(255,255,255,0.12)",
-                        "rgba(0,0,0,0.08)",
+                        "rgba(255,255,255,0.15)",
+                        "rgba(0,0,0,0.10)",
                     ),
                 },
             ),
@@ -283,7 +291,7 @@ def header() -> rx.Component:
             align_items="center",
         ),
         
-        padding=f"{SPACING_REM['lg']} {SPACING_REM['xl']}",
+        padding=f"{SPACING_REM['md']} {SPACING_REM['xl']}",
         border_bottom=rx.cond(
             ChatState.theme_mode == "dark",
             f"1px solid {DARK_COLORS['border_header']}",
@@ -298,46 +306,133 @@ def header() -> rx.Component:
 
 
 def messages_area() -> rx.Component:
-    """Messages area - đơn giản, rộng rãi."""
+    """Messages area với hero section hiện đại."""
     return rx.box(
         rx.vstack(
             # Hero hoặc Messages
             rx.cond(
                 ChatState.messages.length() == 0,
-                # Hero section tinh gọn
+                # Hero section với gradient và animation
                 rx.vstack(
-                    # Title lớn
-                    rx.text(
-                        "Chào mừng đến với Trợ lý tuyển sinh HUCE",
-                        font_size="1.6rem",
-                        font_weight="600",
-                        color=rx.cond(
-                            ChatState.theme_mode == "dark",
-                            DARK_COLORS["text_primary"],
-                            LIGHT_COLORS["text_primary"],
+                    # Icon lớn với animation
+                    rx.box(
+                        rx.icon(
+                            "sparkles",
+                            size=48,
+                            color=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "#60a5fa",
+                                HUCE_PRIMARY,
+                            ),
                         ),
+                        margin_bottom="24px",
+                        animation="bounce 2s ease-in-out infinite",
+                    ),
+
+                    # Title với gradient text
+                    rx.heading(
+                        "Xin chào! Tôi có thể giúp gì cho bạn?",
+                        size="8",
+                        font_weight="700",
                         text_align="center",
-                        line_height="1.3",
-                        max_width="720px",
+                        line_height="1.2",
+                        max_width="800px",
+                        background=rx.cond(
+                            ChatState.theme_mode == "dark",
+                            "linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%)",
+                            "linear-gradient(135deg, #0052CC 0%, #1e40af 100%)",
+                        ),
+                        background_clip="text",
+                        style={
+                            "-webkit-background-clip": "text",
+                            "-webkit-text-fill-color": "transparent",
+                        },
                     ),
                     
                     # Subtitle
                     rx.text(
-                        "Hỏi về ngành học, tổ hợp, điểm chuẩn, lịch tuyển sinh, học phí và học bổng.",
-                        font_size="1rem",
+                        "Hỏi tôi về ngành học, điểm chuẩn, học phí, học bổng, lịch tuyển sinh và nhiều hơn nữa...",
+                        font_size="1.125rem",
                         color=rx.cond(
                             ChatState.theme_mode == "dark",
                             DARK_COLORS["text_secondary"],
                             LIGHT_COLORS["text_secondary"],
                         ),
                         text_align="center",
-                        line_height="1.6",
-                        max_width="640px",
+                        line_height="1.7",
+                        max_width="700px",
+                        margin_top="16px",
                     ),
                     
-                    spacing=SPACING["lg"],
+                    # Feature cards
+                    rx.hstack(
+                        rx.box(
+                            rx.vstack(
+                                rx.icon("book-open", size=24),
+                                rx.text("Ngành học", font_weight="500", font_size="0.9rem"),
+                                spacing="2",
+                                align_items="center",
+                            ),
+                            padding="20px",
+                            background=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "rgba(59, 130, 246, 0.1)",
+                                "rgba(0, 82, 204, 0.05)",
+                            ),
+                            border_radius="16px",
+                            border=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "1px solid rgba(59, 130, 246, 0.2)",
+                                "1px solid rgba(0, 82, 204, 0.1)",
+                            ),
+                        ),
+                        rx.box(
+                            rx.vstack(
+                                rx.icon("trophy", size=24),
+                                rx.text("Điểm chuẩn", font_weight="500", font_size="0.9rem"),
+                                spacing="2",
+                                align_items="center",
+                            ),
+                            padding="20px",
+                            background=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "rgba(59, 130, 246, 0.1)",
+                                "rgba(0, 82, 204, 0.05)",
+                            ),
+                            border_radius="16px",
+                            border=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "1px solid rgba(59, 130, 246, 0.2)",
+                                "1px solid rgba(0, 82, 204, 0.1)",
+                            ),
+                        ),
+                        rx.box(
+                            rx.vstack(
+                                rx.icon("wallet", size=24),
+                                rx.text("Học phí", font_weight="500", font_size="0.9rem"),
+                                spacing="2",
+                                align_items="center",
+                            ),
+                            padding="20px",
+                            background=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "rgba(59, 130, 246, 0.1)",
+                                "rgba(0, 82, 204, 0.05)",
+                            ),
+                            border_radius="16px",
+                            border=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "1px solid rgba(59, 130, 246, 0.2)",
+                                "1px solid rgba(0, 82, 204, 0.1)",
+                            ),
+                        ),
+                        spacing="4",
+                        margin_top="32px",
+                    ),
+
+                    spacing="3",
                     align_items="center",
-                    padding=SPACING_REM["2xl"],
+                    padding="64px 32px",
                 ),
                 
                 # Messages list
@@ -346,7 +441,7 @@ def messages_area() -> rx.Component:
                         ChatState.messages,
                         message_bubble,
                     ),
-                    # Loading
+                    # Loading indicator với animation
                     rx.cond(
                         ChatState.is_loading,
                         rx.hstack(
@@ -354,38 +449,43 @@ def messages_area() -> rx.Component:
                                 size="3",
                                 color=rx.cond(
                                     ChatState.theme_mode == "dark",
-                                    DARK_COLORS["primary"],
-                                    LIGHT_COLORS["primary"],
+                                    "#60a5fa",
+                                    HUCE_PRIMARY,
                                 ),
                             ),
                             rx.text(
-                                "Đang xử lý...",
-                                font_size=FONT_SIZES["sm"],
+                                "Đang suy nghĩ...",
+                                font_size="0.95rem",
                                 color=rx.cond(
                                     ChatState.theme_mode == "dark",
                                     DARK_COLORS["text_secondary"],
                                     LIGHT_COLORS["text_secondary"],
                                 ),
-                                font_style="italic",
                             ),
-                            spacing=SPACING["sm"],
-                            padding=SPACING_REM["lg"],
+                            spacing="3",
+                            padding="16px 24px",
+                            background=rx.cond(
+                                ChatState.theme_mode == "dark",
+                                "rgba(59, 130, 246, 0.05)",
+                                "rgba(0, 82, 204, 0.03)",
+                            ),
+                            border_radius="12px",
                         ),
                         rx.box(),
                     ),
-                    spacing="0",
+                    spacing="3",
                     width="100%",
-                    max_width="900px",
-                    padding=SPACING_REM["xl"],
+                    max_width="1000px",
+                    padding="32px 24px",
                 ),
             ),
             
-            # Suggested questions - LUÔN HIỂN THỊ
+            # Suggested questions
             suggested_questions(),
             
-            spacing="0",
+            spacing="4",
             width="100%",
-            max_width="900px",
+            max_width="1000px",
             margin="0 auto",
         ),
         
@@ -398,23 +498,30 @@ def messages_area() -> rx.Component:
             LIGHT_COLORS["bg_chat"],
         ),
         
-        # Scrollbar tinh gọn
+        # Custom scrollbar
         style={
             "&::-webkit-scrollbar": {"width": "8px"},
             "&::-webkit-scrollbar-track": {
-                "background": rx.cond(
-                    ChatState.theme_mode == "dark",
-                    "#1e293b",
-                    "#f1f5f9",
-                )
+                "background": "transparent",
             },
             "&::-webkit-scrollbar-thumb": {
                 "background": rx.cond(
                     ChatState.theme_mode == "dark",
-                    "#475569",
-                    HUCE_PRIMARY,
+                    "rgba(255,255,255,0.2)",
+                    "rgba(0,0,0,0.2)",
                 ),
                 "border-radius": "4px",
+            },
+            "&::-webkit-scrollbar-thumb:hover": {
+                "background": rx.cond(
+                    ChatState.theme_mode == "dark",
+                    "rgba(255,255,255,0.3)",
+                    "rgba(0,0,0,0.3)",
+                ),
+            },
+            "@keyframes bounce": {
+                "0%, 100%": {"transform": "translateY(0)"},
+                "50%": {"transform": "translateY(-10px)"},
             },
         },
     )

@@ -312,9 +312,9 @@ async def advanced_chat(req: AdvancedChatRequest):
         → Intent rõ → Trả điểm chuẩn từ CSV
         → Lưu context: last_intent="hoi_diem_chuan", last_entities=[Kiến trúc]
 
-        User 2: "Còn điểm sàn?"
+        User 2: "Còn học phí thế nào?"
         → Dùng context → Biết "còn" = tiếp tục hỏi về Kiến trúc
-        → Trả điểm sàn Kiến trúc
+        → Trả học phí Kiến trúc
     """
     try:
         # Log request với session_id để tracking user
@@ -347,9 +347,25 @@ async def advanced_chat(req: AdvancedChatRequest):
             session_id,
             {"message": message, "intent": analysis["intent"], "response": response},
         )
-        # Lưu intent và entities của câu hiện tại
+
+        # Lưu intent của câu hiện tại
         new_context["last_intent"] = analysis["intent"]
-        new_context["last_entities"] = analysis["entities"]
+
+        # Lưu entities - PRESERVE major entities từ context cũ nếu câu mới không có
+        current_entities = analysis["entities"]
+        has_major = any(e.get('label') in ['TEN_NGANH', 'CHUYEN_NGANH', 'MA_NGANH'] for e in current_entities)
+
+        if has_major:
+            # Câu mới có major info → Dùng entities mới
+            new_context["last_entities"] = current_entities
+        else:
+            # Câu mới không có major info → Giữ major entities từ context cũ
+            old_major_entities = [
+                e for e in current_context.get("last_entities", [])
+                if e.get('label') in ['TEN_NGANH', 'CHUYEN_NGANH', 'MA_NGANH']
+            ]
+            # Merge: major entities cũ + entities mới (non-major)
+            new_context["last_entities"] = old_major_entities + current_entities
 
         # Bước 4: Trả về kết quả đầy đủ
         return {"analysis": analysis, "response": response, "context": new_context}

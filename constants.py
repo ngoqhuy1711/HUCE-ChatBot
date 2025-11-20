@@ -16,7 +16,6 @@ class Intent:
 
     # Intent chính - Hỏi thông tin
     HOI_DIEM_CHUAN = "hoi_diem_chuan"
-    HOI_DIEM_SAN = "hoi_diem_san"
     HOI_NGANH_HOC = "hoi_nganh_hoc"
     HOI_HOC_PHI = "hoi_hoc_phi"
     HOI_HOC_BONG = "hoi_hoc_bong"
@@ -36,7 +35,6 @@ class Intent:
     # Tất cả intents hợp lệ
     ALL_INTENTS = [
         HOI_DIEM_CHUAN,
-        HOI_DIEM_SAN,
         HOI_NGANH_HOC,
         HOI_HOC_PHI,
         HOI_HOC_BONG,

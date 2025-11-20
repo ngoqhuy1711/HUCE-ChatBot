@@ -40,7 +40,7 @@ Context = ngữ cảnh hội thoại, giúp bot "nhớ" cuộc trò chuyện.
 Ví dụ:
   User: "Điểm chuẩn ngành Kiến trúc?"
   Bot: "25.5 điểm"
-  User: "Còn điểm sàn?"  ← Bot biết "còn" = tiếp tục hỏi về Kiến trúc
+  User: "Còn điểm chuẩn?"  ← Bot biết "còn" = tiếp tục hỏi về Kiến trúc
 
 Context lưu:
 - last_intent: "hoi_diem_chuan"
