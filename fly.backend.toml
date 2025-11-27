@@ -1,0 +1,43 @@
+# Fly.io Configuration
+app = "huce-chatbot-backend"
+primary_region = "sin"  # Singapore
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  INTENT_THRESHOLD = "0.25"
+  CONTEXT_HISTORY_LIMIT = "10"
+  LOG_LEVEL = "INFO"
+  DEBUG = "false"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8000
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "requests"
+    hard_limit = 250
+    soft_limit = 200
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
