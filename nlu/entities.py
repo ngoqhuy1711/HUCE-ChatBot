@@ -11,7 +11,7 @@ Module này trích xuất các entity từ câu hỏi người dùng:
 import csv
 import json
 import os
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Set, Tuple, Optional
 
 from .preprocess import normalize_text
 
@@ -122,7 +122,7 @@ class EntityExtractor:
     3. NER từ Underthesea
     """
 
-    def __init__(self, data_dir: str, patterns_path: str, synonym_map: Dict[str, str] = None) -> None:
+    def __init__(self, data_dir: str, patterns_path: str, synonym_map: Optional[Dict[str, str]] = None) -> None:
         """
         Khởi tạo Entity Extractor
 

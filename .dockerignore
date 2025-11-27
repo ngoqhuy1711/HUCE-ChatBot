@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+
+# Logs
+*.log
+logs/*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Documentation
+*.md
+docs/
+
+# Development
+.env
+.env.local
+.env.development
+
+# Reflex
+.web/
+node_modules/
+frontend/.web/
+frontend/node_modules/
+
+# Cache
+.mypy_cache/
+.ruff_cache/
+
+# Tools
+tools/
+scripts/dev/
+

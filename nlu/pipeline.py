@@ -1,249 +1,135 @@
-"""
-NLP Pipeline chính cho Chatbot Tư vấn Tuyển sinh HUCE
-
-File này chứa class NLPPipeline - thành phần trung tâm xử lý ngôn ngữ tự nhiên:
-- Tiền xử lý văn bản (normalize, tokenize)
-- Nhận diện intent (ý định của người dùng)
-- Trích xuất entity (thực thể trong câu hỏi)
-- Tích hợp với Underthesea cho tiếng Việt
-"""
+"""NLP Pipeline - Intent detection và Entity extraction."""
 
 import csv
 import os
-from typing import List, Dict, Tuple, Any
+from typing import List, Dict, Tuple, Any, Optional
 
-# Import Underthesea cho xử lý tiếng Việt
 try:
     from underthesea import word_tokenize
-except ImportError:  # fallback nếu không cài đặt được underthesea
-
+except ImportError:
     def word_tokenize(text: str):
         return text.split()
 
-# Import NER (Named Entity Recognition) từ Underthesea
 try:
-    from underthesea import ner as uts_ner  # type: ignore
+    from underthesea import ner as uts_ner
 except ImportError:
-    uts_ner = None  # type: ignore
+    uts_ner = None
 
-# Import các module con của NLP pipeline
 try:
     from .preprocess import normalize_text as ext_normalize_text
     from .preprocess import tokenize_and_map as ext_tokenize_and_map
 except ImportError:
-    ext_normalize_text = None  # type: ignore
-    ext_tokenize_and_map = None  # type: ignore
+    ext_normalize_text = None
+    ext_tokenize_and_map = None
+
 try:
     from .intent import IntentDetector
 except ImportError:
-    IntentDetector = None  # type: ignore
+    IntentDetector = None
+
 try:
     from .entities import EntityExtractor
 except ImportError:
-    EntityExtractor = None  # type: ignore
+    EntityExtractor = None
 
-# Import constants từ config module
 from config import DATA_DIR, get_intent_threshold
 
-# Ngưỡng intent mặc định (dùng từ config)
 DEFAULT_INTENT_THRESHOLD = get_intent_threshold()
 
 
 def _normalize_text(text) -> str:
-    """
-    Chuẩn hóa văn bản (fallback function)
-
-    Args:
-        text: Văn bản cần chuẩn hóa
-
-    Returns:
-        Văn bản đã được chuẩn hóa (lowercase, strip)
-    """
+    """Chuẩn hóa văn bản."""
     if ext_normalize_text is not None:
         return ext_normalize_text(text)
-    # fallback minimal - chỉ lowercase và strip
     if not isinstance(text, str):
         text = str(text) if text is not None else ""
     return text.lower().strip()
 
 
 def _load_synonyms(path: str) -> Dict[str, str]:
-    """
-    Load từ điển từ đồng nghĩa từ file CSV
-
-    Format CSV: entity,canonical,alias
-    - entity: Loại entity (MAJOR, METHOD, PROGRAM, etc.)
-    - canonical: Tên chuẩn (ví dụ: "Công nghệ thông tin")
-    - alias: Từ viết tắt/đồng nghĩa (ví dụ: "CNTT", "IT")
-
-    Mapping: alias (normalized) -> canonical (normalized)
-
-    Args:
-        path: Đường dẫn file synonym.csv
-
-    Returns:
-        Dict mapping từ đồng nghĩa -> từ chuẩn
-    """
+    """Load từ điển từ đồng nghĩa từ file CSV."""
     mapping: Dict[str, str] = {}
     if not os.path.isfile(path):
         return mapping
 
     with open(path, newline="", encoding="utf-8") as f:
         reader = csv.reader(f)
-        header = next(reader, None)  # Skip header
-
+        next(reader, None)
         for row in reader:
-            # Skip comment lines và empty lines
-            if not row or (row[0] and row[0].strip().startswith('#')):
+            if not row or (row[0] and row[0].strip().startswith('#')) or len(row) < 3:
                 continue
-
-            if len(row) < 3:
-                continue
-
-            entity = row[0].strip()
-            canonical = row[1].strip()
-            alias = row[2].strip()
-
-            # Skip header duplicates
+            entity, canonical, alias = row[0].strip(), row[1].strip(), row[2].strip()
             if entity == "entity" or not alias or not canonical:
                 continue
-
-            # Normalize cả 2 để mapping đúng
-            alias_norm = _normalize_text(alias)
-            canonical_norm = _normalize_text(canonical)
-
+            alias_norm, canonical_norm = _normalize_text(alias), _normalize_text(canonical)
             if alias_norm and canonical_norm:
-                # Map: alias -> canonical
                 mapping[alias_norm] = canonical_norm
-
     return mapping
 
 
 class NLPPipeline:
-    """
-    Pipeline xử lý ngôn ngữ tự nhiên chính
+    """Pipeline xử lý ngôn ngữ tự nhiên chính."""
 
-    Chức năng:
-    - Nhận diện intent (ý định người dùng)
-    - Trích xuất entity (thực thể trong câu hỏi)
-    - Xử lý từ đồng nghĩa
-    - Fallback bằng keyword matching
-    """
-
-    def __init__(
-            self,
-            data_dir: str = DATA_DIR,
-            intent_threshold: float = DEFAULT_INTENT_THRESHOLD,
-    ) -> None:
-        """
-        Khởi tạo NLP Pipeline
-
-        Args:
-            data_dir: Thư mục chứa dữ liệu CSV/JSON
-            intent_threshold: Ngưỡng nhận diện intent
-        """
+    def __init__(self, data_dir: str = DATA_DIR, intent_threshold: float = DEFAULT_INTENT_THRESHOLD) -> None:
         self.data_dir = data_dir
         self.intent_threshold = intent_threshold
-
-        # Load từ điển từ đồng nghĩa
         self.syn_map = _load_synonyms(os.path.join(data_dir, "synonym.csv"))
+        self.intent_samples = self._load_intent_samples(os.path.join(data_dir, "intent.csv"))
 
-        # Load mẫu câu cho intent detection
-        self.intent_samples = self._load_intent_samples(
-            os.path.join(data_dir, "intent.csv")
-        )
-
-        # Keyword backoff rules - fallback khi TF-IDF không nhận diện được
-        # Cần CẢ 2 versions: có dấu VÀ không dấu (vì user có thể nhập cả 2 cách)
+        # Keyword backoff rules
         self.intent_keyword_backoff: Dict[str, str] = {
-            # Có dấu
-            "điểm chuẩn": "hoi_diem_chuan",
-            "chỉ tiêu": "hoi_chi_tieu",
-            "học phí": "hoi_hoc_phi",
-            "học bổng": "hoi_hoc_bong",
-            "phương thức": "hoi_phuong_thuc",
-            "điều kiện": "hoi_dieu_kien",
-            "thời gian": "hoi_thoi_gian_dk",
-            "kênh nộp": "hoi_kenh_nop_ho_so",
-            "nộp hồ sơ": "hoi_kenh_nop_ho_so",
-            "tổ hợp": "hoi_to_hop_mon",
-            "khối thi": "hoi_khoi_thi",
-            # Không dấu (cho trường hợp user nhập không dấu)
-            "diem chuan": "hoi_diem_chuan",
-            "chi tieu": "hoi_chi_tieu",
-            "hoc phi": "hoi_hoc_phi",
-            "hoc bong": "hoi_hoc_bong",
-            "phuong thuc": "hoi_phuong_thuc",
-            "dieu kien": "hoi_dieu_kien",
-            "thoi gian": "hoi_thoi_gian_dk",
-            "kenh nop": "hoi_kenh_nop_ho_so",
-            "nop ho so": "hoi_kenh_nop_ho_so",
-            "to hop": "hoi_to_hop_mon",
-            "khoi thi": "hoi_khoi_thi",
-            "mã ngành": "hoi_ma_nganh",
-            "ma nganh": "hoi_ma_nganh",
-            # Major description queries - có dấu
-            "mô tả ngành": "hoi_nganh_hoc",
-            "giới thiệu ngành": "hoi_nganh_hoc",
-            "học gì": "hoi_nganh_hoc",
-            "là gì": "hoi_nganh_hoc",
-            "ra làm gì": "hoi_nganh_hoc",
-            "học những gì": "hoi_nganh_hoc",
-            "đào tạo gì": "hoi_nganh_hoc",
-            "chương trình đào tạo": "hoi_nganh_hoc",
-            "cho biết về ngành": "hoi_nganh_hoc",
-            "thông tin về ngành": "hoi_nganh_hoc",
-            "tìm hiểu về ngành": "hoi_nganh_hoc",
-            "về ngành": "hoi_nganh_hoc",
-            "giới thiệu về": "hoi_nganh_hoc",
-            # Major description queries - không dấu
-            "mo ta nganh": "hoi_nganh_hoc",
-            "gioi thieu nganh": "hoi_nganh_hoc",
-            "hoc gi": "hoi_nganh_hoc",
-            "la gi": "hoi_nganh_hoc",
-            "ra lam gi": "hoi_nganh_hoc",
-            "hoc nhung gi": "hoi_nganh_hoc",
-            "dao tao gi": "hoi_nganh_hoc",
-            "chuong trinh dao tao": "hoi_nganh_hoc",
-            "cho biet ve nganh": "hoi_nganh_hoc",
-            "thong tin ve nganh": "hoi_nganh_hoc",
-            "tim hieu ve nganh": "hoi_nganh_hoc",
-            "ve nganh": "hoi_nganh_hoc",
-            "gioi thieu ve": "hoi_nganh_hoc",
-            # Common terms
-            "phi": "hoi_hoc_phi",
-            "deadline": "hoi_thoi_gian_dk",
-            "liên hệ": "hoi_lien_he",
-            "v-sat": "hoi_phuong_thuc",
-            "vsat": "hoi_phuong_thuc",
+            "điểm chuẩn": "hoi_diem_chuan", "diem chuan": "hoi_diem_chuan",
+            "chỉ tiêu": "hoi_chi_tieu", "chi tieu": "hoi_chi_tieu",
+            "học phí": "hoi_hoc_phi", "hoc phi": "hoi_hoc_phi", "phi": "hoi_hoc_phi",
+            "học bổng": "hoi_hoc_bong", "hoc bong": "hoi_hoc_bong",
+            "phương thức": "hoi_phuong_thuc", "phuong thuc": "hoi_phuong_thuc",
+            "điều kiện": "hoi_dieu_kien", "dieu kien": "hoi_dieu_kien",
+            "thời gian": "hoi_thoi_gian_dk", "thoi gian": "hoi_thoi_gian_dk", "deadline": "hoi_thoi_gian_dk",
+            "kênh nộp": "hoi_kenh_nop_ho_so", "kenh nop": "hoi_kenh_nop_ho_so",
+            "nộp hồ sơ": "hoi_kenh_nop_ho_so", "nop ho so": "hoi_kenh_nop_ho_so",
+            "tổ hợp": "hoi_to_hop_mon", "to hop": "hoi_to_hop_mon",
+            "khối thi": "hoi_to_hop_mon", "khoi thi": "hoi_to_hop_mon",
+            "môn thi": "hoi_to_hop_mon", "mon thi": "hoi_to_hop_mon",
+            "mã ngành": "hoi_ma_nganh", "ma nganh": "hoi_ma_nganh",
+            # Mã tổ hợp cụ thể
+            " a00": "hoi_to_hop_mon", " a01": "hoi_to_hop_mon", " a02": "hoi_to_hop_mon",
+            " b00": "hoi_to_hop_mon", " c01": "hoi_to_hop_mon", " c02": "hoi_to_hop_mon",
+            " d01": "hoi_to_hop_mon", " d07": "hoi_to_hop_mon", " d24": "hoi_to_hop_mon", " d29": "hoi_to_hop_mon",
+            " h00": "hoi_to_hop_mon", " h07": "hoi_to_hop_mon",
+            " v00": "hoi_to_hop_mon", " v01": "hoi_to_hop_mon", " v02": "hoi_to_hop_mon",
+            " x05": "hoi_to_hop_mon", " x06": "hoi_to_hop_mon", " x26": "hoi_to_hop_mon",
+            " k00": "hoi_to_hop_mon", " sp1": "hoi_to_hop_mon", " sp2": "hoi_to_hop_mon",
+            " sp3": "hoi_to_hop_mon", " sp4": "hoi_to_hop_mon",
+            " vs1": "hoi_to_hop_mon", " vs2": "hoi_to_hop_mon", " vs3": "hoi_to_hop_mon", " vs4": "hoi_to_hop_mon",
+            # Major description
+            "mô tả ngành": "hoi_nganh_hoc", "mo ta nganh": "hoi_nganh_hoc",
+            "giới thiệu ngành": "hoi_nganh_hoc", "gioi thieu nganh": "hoi_nganh_hoc",
+            "học gì": "hoi_nganh_hoc", "hoc gi": "hoi_nganh_hoc",
+            "là gì": "hoi_nganh_hoc", "la gi": "hoi_nganh_hoc",
+            "ra làm gì": "hoi_nganh_hoc", "ra lam gi": "hoi_nganh_hoc",
+            "học những gì": "hoi_nganh_hoc", "hoc nhung gi": "hoi_nganh_hoc",
+            "đào tạo gì": "hoi_nganh_hoc", "dao tao gi": "hoi_nganh_hoc",
+            "chương trình đào tạo": "hoi_nganh_hoc", "chuong trinh dao tao": "hoi_nganh_hoc",
+            "cho biết về ngành": "hoi_nganh_hoc", "cho biet ve nganh": "hoi_nganh_hoc",
+            "thông tin về ngành": "hoi_nganh_hoc", "thong tin ve nganh": "hoi_nganh_hoc",
+            "tìm hiểu về ngành": "hoi_nganh_hoc", "tim hieu ve nganh": "hoi_nganh_hoc",
+            "về ngành": "hoi_nganh_hoc", "ve nganh": "hoi_nganh_hoc",
+            "giới thiệu về": "hoi_nganh_hoc", "gioi thieu ve": "hoi_nganh_hoc",
+            # Other
+            "liên hệ": "hoi_lien_he", "v-sat": "hoi_phuong_thuc", "vsat": "hoi_phuong_thuc",
         }
 
-        # Khởi tạo các detector (có thể None nếu import thất bại)
-        self._intent_detector = (
-            IntentDetector(
-                self.intent_samples, self.intent_keyword_backoff, self.intent_threshold
-            )
-            if IntentDetector
-            else None
+        self._intent_detector: Optional[IntentDetector] = (
+            IntentDetector(self.intent_samples, self.intent_keyword_backoff, self.intent_threshold)
+            if IntentDetector is not None else None
         )
-        self._entity_extractor = (
+        self._entity_extractor: Optional[EntityExtractor] = (
             EntityExtractor(self.data_dir, os.path.join(data_dir, "entity.json"), self.syn_map)
-            if EntityExtractor
-            else None
+            if EntityExtractor is not None else None
         )
-
-    # ---------- Loaders - Các hàm load dữ liệu ----------
 
     def _load_intent_samples(self, path: str) -> Dict[str, List[List[str]]]:
-        """
-        Load mẫu câu cho intent detection từ file CSV
-
-        Args:
-            path: Đường dẫn file intent.csv
-
-        Returns:
-            Dict mapping intent -> list of tokenized samples
-        """
+        """Load mẫu câu cho intent detection."""
         intent_to_samples: Dict[str, List[List[str]]] = {}
         if not os.path.isfile(path):
             return intent_to_samples
@@ -251,113 +137,51 @@ class NLPPipeline:
         with open(path, newline="", encoding="utf-8") as f:
             reader = csv.DictReader(f)
             for r in reader:
-                utt = _normalize_text(r.get("utterance") or "")  # Câu hỏi mẫu
-                intent = (r.get("intent") or "").strip()  # Intent tương ứng
+                utt = _normalize_text(r.get("utterance") or "")
+                intent = (r.get("intent") or "").strip()
                 if not utt or not intent:
                     continue
-
-                # Tokenize và map từ đồng nghĩa
-                if ext_tokenize_and_map is not None:
-                    toks = ext_tokenize_and_map(utt, self.syn_map)
-                else:
-                    toks = utt.split()  # Fallback
-
+                toks = ext_tokenize_and_map(utt, self.syn_map) if ext_tokenize_and_map else utt.split()
                 intent_to_samples.setdefault(intent, []).append(toks)
         return intent_to_samples
 
-    # ---------- Intent Detection - Nhận diện ý định ----------
     def detect_intent(self, text: str) -> Tuple[str, float]:
-        """
-        Nhận diện intent của câu hỏi
-
-        Args:
-            text: Câu hỏi từ người dùng
-
-        Returns:
-            Tuple (intent, confidence_score)
-        """
+        """Nhận diện intent của câu hỏi."""
         if self._intent_detector is None:
             return "fallback", 0.0
         return self._intent_detector.detect(text, self.syn_map, _normalize_text)
 
-    # ---------- Entity Extraction - Trích xuất thực thể ----------
     def extract_entities(self, text: str) -> List[Dict[str, Any]]:
-        """
-        Trích xuất các entity trong câu hỏi
-
-        Args:
-            text: Câu hỏi từ người dùng
-
-        Returns:
-            List các entity được trích xuất
-        """
+        """Trích xuất các entity trong câu hỏi."""
         if self._entity_extractor is None:
             return []
         return self._entity_extractor.extract(text)
 
-    # ---------- Public API - Giao diện chính ----------
     def analyze(self, text: str) -> Dict[str, Any]:
-        """
-        Phân tích toàn diện câu hỏi từ người dùng
-
-        Args:
-            text: Câu hỏi từ người dùng
-
-        Returns:
-            Dict chứa intent, score và entities
-        """
-        # Nhận diện intent
+        """Phân tích toàn diện câu hỏi từ người dùng."""
         intent, score = self.detect_intent(text)
-
-        # Trích xuất entities
         entities = self.extract_entities(text)
 
-        # Heuristic: Override intent detection nếu phát hiện câu hỏi rõ ràng về ngành học
-        # Áp dụng khi:
-        # 1. Intent hiện tại không chắc chắn (fallback, tro_giup, hoặc score thấp)
-        # 2. Phát hiện entity ngành học + từ khóa giới thiệu/tìm hiểu
+        # Heuristic: Override intent cho câu hỏi rõ ràng về ngành học
         norm_text = _normalize_text(text)
-
-        # Các intent có thể bị nhầm với hỏi ngành học
         uncertain_intents = ["fallback", "tro_giup", "chao_hoi"]
         is_uncertain = intent in uncertain_intents or score < (self.intent_threshold + 0.15)
 
         if is_uncertain and entities:
-            # Kiểm tra xem có entity TEN_NGANH hoặc CHUYEN_NGANH không
             has_major = any(e.get("label") in ["TEN_NGANH", "CHUYEN_NGANH"] for e in entities)
-            # Kiểm tra xem câu hỏi có chứa từ "ngành" hoặc "nganh"
             has_nganh_keyword = "nganh" in norm_text
-
-            # KHÔNG áp dụng heuristic nếu có các từ khóa specific khác
-            # như "mã ngành", "điểm", "học phí", "chỉ tiêu", "tổ hợp"
-            # Bao gồm CẢ version có dấu VÀ không dấu
-            exclusion_keywords = [
-                # Mã ngành
-                "ma nganh", "mã ngành", "ma ", " ma",
-                # Điểm
-                "diem chuan", "điểm chuẩn", "diem ", "điểm ",
-                # Học phí
-                "hoc phi", "học phí", "tien hoc", "tiền học", "chi phi", "chi phí",
-                # Chỉ tiêu
-                "chi tieu", "chỉ tiêu", "tuyen sinh", "tuyển sinh", "tuyen", "tuyển",
-                # Tổ hợp môn
-                "to hop", "tổ hợp", "khoi thi", "khối thi", "mon thi", "môn thi",
-                # Phương thức
-                "phuong thuc", "phương thức", "xet tuyen", "xét tuyển"
-            ]
+            exclusion_keywords = ["ma nganh", "mã ngành", "ma ", " ma", "diem chuan", "điểm chuẩn", "diem ", "điểm ",
+                                  "hoc phi", "học phí", "tien hoc", "tiền học", "chi phi", "chi phí",
+                                  "chi tieu", "chỉ tiêu", "tuyen sinh", "tuyển sinh", "tuyen", "tuyển",
+                                  "to hop", "tổ hợp", "khoi thi", "khối thi", "mon thi", "môn thi",
+                                  "phuong thuc", "phương thức", "xet tuyen", "xét tuyển"]
             has_exclusion = any(kw in norm_text for kw in exclusion_keywords)
-
-            # Từ khóa chỉ ra intent hỏi về ngành học
-            major_intro_keywords = [
-                "gioi thieu", "tim hieu", "mo ta", "la gi", "hoc gi",
-                "ve nganh", "thong tin ve", "cho biet ve", "muon biet"
-            ]
+            major_intro_keywords = ["gioi thieu", "tim hieu", "mo ta", "la gi", "hoc gi", "ve nganh", "thong tin ve",
+                                    "cho biet ve", "muon biet"]
             has_intro_keyword = any(kw in norm_text for kw in major_intro_keywords)
 
-            # Nếu có tên ngành HOẶC (có từ "ngành" + có từ khóa giới thiệu)
-            # và KHÔNG có từ khóa exclusion thì cho là hỏi về ngành học
             if (has_major or (has_nganh_keyword and has_intro_keyword)) and not has_exclusion:
                 intent = "hoi_nganh_hoc"
-                score = self.intent_threshold + 0.15  # Đảm bảo vượt ngưỡng rõ ràng
+                score = self.intent_threshold + 0.15
 
         return {"intent": intent, "score": score, "entities": entities}

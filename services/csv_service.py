@@ -1,8 +1,5 @@
 """
-CSV Service - Entry Point với Backward Compatibility
-
-==== CẤU TRÚC MỚI (Module hóa) ====
-File này giờ là entry point, re-export tất cả functions từ các module con:
+CSV Service
 
 services/
 ├── csv_service.py          # ← File này (backward compatible)
@@ -18,13 +15,6 @@ services/
 └── handlers/               # Intent handling logic
     ├── intent_handler.py  # Intent queries
     └── fallback.py        # Fallback queries
-
-==== TƯƠNG THÍCH NGƯỢC ====
-Tất cả import từ csv_service vẫn hoạt động như cũ:
-    from services.csv_service import find_standard_score
-    from services.csv_service import list_majors
-    from services.csv_service import handle_intent_query
-    ...
 
 ==== CẤU TRÚC DỮ LIỆU CSV ====
 1. **majors.csv**: Thông tin ngành học

@@ -1,0 +1,85 @@
+# =============================================================================
+# Docker Compose - HUCE Chatbot Full Stack
+# =============================================================================
+
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: huce-chatbot-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - SERVER_PORT=8000
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=http://localhost:3000,http://frontend:3000
+      - CORS_ALLOW_CREDENTIALS=true
+      - INTENT_THRESHOLD=0.35
+      - CONTEXT_HISTORY_LIMIT=10
+      - ENABLE_CSV_CACHE=true
+    volumes:
+      - ./data:/app/data:ro
+      - ./logs:/app/logs
+    networks:
+      - huce-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: huce-chatbot-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "8001:8001"  # Reflex WebSocket backend
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - huce-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: huce-chatbot-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - huce-network
+
+networks:
+  huce-network:
+    driver: bridge
+
+volumes:
+  logs:
+

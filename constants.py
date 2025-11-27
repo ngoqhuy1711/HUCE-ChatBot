@@ -1,20 +1,8 @@
-"""
-Constants - Các hằng số dùng chung trong toàn bộ backend
-
-Tập trung tất cả magic strings, intent names, entity labels vào đây
-để dễ bảo trì và tránh typo.
-"""
-
-
-# ==============================================================================
-# INTENT NAMES - Tên các intent được nhận diện
-# ==============================================================================
+"""Constants - Hằng số dùng chung."""
 
 
 class Intent:
-    """Các intent được hỗ trợ bởi chatbot"""
-
-    # Intent chính - Hỏi thông tin
+    """Các intent được hỗ trợ."""
     HOI_DIEM_CHUAN = "hoi_diem_chuan"
     HOI_NGANH_HOC = "hoi_nganh_hoc"
     HOI_HOC_PHI = "hoi_hoc_phi"
@@ -27,56 +15,29 @@ class Intent:
     HOI_LICH_TUYEN_SINH = "hoi_lich_tuyen_sinh"
     HOI_KENH_NOP_HO_SO = "hoi_kenh_nop_ho_so"
     HOI_LIEN_HE = "hoi_lien_he"
-
-    # Intent đặc biệt
     FALLBACK = "fallback"
     FALLBACK_RESPONSE = "fallback_response"
 
-    # Tất cả intents hợp lệ
     ALL_INTENTS = [
-        HOI_DIEM_CHUAN,
-        HOI_NGANH_HOC,
-        HOI_HOC_PHI,
-        HOI_HOC_BONG,
-        HOI_CHI_TIEU,
-        HOI_TO_HOP_MON,
-        HOI_PHUONG_THUC,
-        HOI_DIEU_KIEN_XET_TUYEN,
-        HOI_UU_TIEN_XET_TUYEN,
-        HOI_LICH_TUYEN_SINH,
-        HOI_KENH_NOP_HO_SO,
-        HOI_LIEN_HE,
-        FALLBACK,
-        FALLBACK_RESPONSE,
+        HOI_DIEM_CHUAN, HOI_NGANH_HOC, HOI_HOC_PHI, HOI_HOC_BONG,
+        HOI_CHI_TIEU, HOI_TO_HOP_MON, HOI_PHUONG_THUC,
+        HOI_DIEU_KIEN_XET_TUYEN, HOI_UU_TIEN_XET_TUYEN,
+        HOI_LICH_TUYEN_SINH, HOI_KENH_NOP_HO_SO, HOI_LIEN_HE,
+        FALLBACK, FALLBACK_RESPONSE,
     ]
 
 
-# ==============================================================================
-# ENTITY LABELS - Nhãn các entity được trích xuất
-# ==============================================================================
-
-
 class Entity:
-    """Các entity labels được trích xuất từ câu hỏi"""
-
-    # Ngành học
+    """Các entity labels."""
     MA_NGANH = "MA_NGANH"
     TEN_NGANH = "TEN_NGANH"
-
-    # Khối thi
     KHOI_THI = "KHOI_THI"
     TO_HOP_MON = "TO_HOP_MON"
-
-    # Điểm số
     DIEM_SO = "DIEM_SO"
     DIEM_CHUAN = "DIEM_CHUAN"
     DIEM_SAN = "DIEM_SAN"
-
-    # Năm học
     NAM_HOC = "NAM_HOC"
     NAM_TUYEN_SINH = "NAM_TUYEN_SINH"
-
-    # Phương thức xét tuyển
     PHUONG_THUC_XET_TUYEN = "PHUONG_THUC_XET_TUYEN"
     PHUONG_THUC_TUYEN_SINH = "PHUONG_THUC_TUYEN_SINH"
     DIEU_KIEN_XET_TUYEN = "DIEU_KIEN_XET_TUYEN"

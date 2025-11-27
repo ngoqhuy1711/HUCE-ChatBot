@@ -1,239 +1,102 @@
-"""
-Theme & Styling Constants
-==========================
+"""Theme & Styling Constants - Blue Theme."""
 
-File này định nghĩa tất cả màu sắc, font, spacing, shadows để giữ UI nhất quán.
+# Primary palette
+PRIMARY_BLUE = "#2563eb"
+PRIMARY_LIGHT = "#3b82f6"
+PRIMARY_DARK = "#1d4ed8"
 
-Sử dụng:
-    from chatbot.styles.theme import COLORS, SPACING, SPACING_REM, SHADOWS
-    
-    # SPACING: Dùng cho HStack/VStack spacing (string '0'-'9')
-    rx.hstack(..., spacing=SPACING["md"])
-    
-    # SPACING_REM: Dùng cho padding, margin, gap (rem units)
-    rx.box(
-        background=COLORS["primary"],
-        padding=SPACING_REM["md"],
-        box_shadow=SHADOWS["md"]
-    )
-"""
+# Secondary accents
+ACCENT_INDIGO = "#6366f1"
+ACCENT_VIOLET = "#8b5cf6"
+ACCENT_SKY = "#0ea5e9"
 
-# ============================================================================
-# COLORS - Bảng màu chính (Light & Dark Mode)
-# ============================================================================
-# HUCE Colors
-HUCE_PRIMARY = "#0052CC"
-HUCE_SECONDARY = "#2563EB"
+# Highlight colors
+HIGHLIGHT_GREEN = "#22c55e"
+HIGHLIGHT_AMBER = "#f59e0b"
+HIGHLIGHT_ROSE = "#f43f5e"
 
-# ============================================================================
-# COLORS - Modern Vibrant Palette (Light & Dark Mode)
-# ============================================================================
-# HUCE Colors - Enhanced
-HUCE_PRIMARY = "#0052CC"
-HUCE_SECONDARY = "#2563EB"
-HUCE_ACCENT = "#3b82f6"
-
-# Light Mode Colors - Fresh & Vibrant
+# Light mode
 LIGHT_COLORS = {
-    # Primary colors
-    "primary": HUCE_PRIMARY,
-    "secondary": HUCE_SECONDARY,
-    "accent": HUCE_ACCENT,
-
-    # Background colors - Clean & Bright
-    "bg_app": "#f8fafc",
-    "bg_sidebar": "#ffffff",
-    "bg_header": "rgba(255, 255, 255, 0.98)",
-    "bg_chat": "#f8fafc",
-    "bg_input_container": "rgba(255, 255, 255, 0.98)",
-    "bg_input": "#ffffff",
-    "bg_input_focus": "#ffffff",
-    "bg_user_msg": "linear-gradient(135deg, #0052CC 0%, #1e40af 50%, #3b82f6 100%)",
-    "bg_bot_msg": "linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)",
-    "bg_feature_card": "#ffffff",
-    "bg_suggestion": "#ffffff",
-    
-    # Text colors - High Contrast
-    "text_primary": "#0f172a",
-    "text_secondary": "#64748b",
-    "text_sidebar": "#1e293b",
-    "text_user_msg": "#ffffff",
-    "text_bot_msg": "#1e293b",
-    "text_input": "#1e293b",
-    "text_placeholder": "#94a3b8",
-
-    # Border colors - Subtle with Accent
-    "border_header": "rgba(226, 232, 240, 0.8)",
-    "border_input": "#cbd5e1",
-    "border_input_focus": HUCE_PRIMARY,
-    "border_bot_msg": "rgba(0, 82, 204, 0.15)",
-    "border_feature_card": "rgba(0, 82, 204, 0.1)",
-    "border_suggestion": "#e2e8f0",
-
-    # Icon colors
-    "icon_sidebar": "#475569",
+    "primary": PRIMARY_BLUE, "secondary": ACCENT_INDIGO, "accent": ACCENT_SKY,
+    "bg_app": "linear-gradient(135deg, #eff6ff 0%, #f0f9ff 50%, #f8fafc 100%)",
+    "bg_sidebar": "linear-gradient(180deg, #1e3a5f 0%, #1e293b 100%)",
+    "bg_header": "rgba(255, 255, 255, 0.95)", "bg_chat": "rgba(255, 255, 255, 0.92)",
+    "bg_input_container": "rgba(255, 255, 255, 0.95)", "bg_input": "#f8fafc", "bg_input_focus": "#ffffff",
+    "bg_user_msg": f"linear-gradient(135deg, {PRIMARY_BLUE} 0%, {PRIMARY_LIGHT} 100%)",
+    "bg_bot_msg": "#ffffff", "bg_feature_card": "rgba(255, 255, 255, 0.9)",
+    "bg_suggestion": "linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%)",
+    "text_primary": "#0f172a", "text_secondary": "#64748b", "text_sidebar": "#f1f5f9",
+    "text_user_msg": "#ffffff", "text_bot_msg": "#1e293b", "text_input": "#1e293b", "text_placeholder": "#94a3b8",
+    "border_header": "rgba(15, 23, 42, 0.08)", "border_input": "rgba(37, 99, 235, 0.2)",
+    "border_input_focus": PRIMARY_BLUE, "border_bot_msg": "rgba(37, 99, 235, 0.15)",
+    "border_feature_card": "rgba(15, 23, 42, 0.08)", "border_suggestion": "rgba(37, 99, 235, 0.2)",
+    "glass_bg": "rgba(255, 255, 255, 0.85)", "glass_border": "rgba(255, 255, 255, 0.5)",
+    "glow_primary": "0 25px 60px rgba(37, 99, 235, 0.12)",
+    "icon_sidebar": "#94a3b8", "icon_active": PRIMARY_LIGHT,
 }
 
-# Dark Mode Colors - Rich & Comfortable
+# Dark mode
 DARK_COLORS = {
-    # Primary colors (brighter for contrast)
-    "primary": "#3b82f6",
-    "secondary": "#60a5fa",
-    "accent": "#93c5fd",
-
-    # Background colors - Deep & Rich
-    "bg_app": "#0a0f1e",
-    "bg_sidebar": "#0f172a",
-    "bg_header": "rgba(15, 23, 42, 0.98)",
-    "bg_chat": "#0a0f1e",
-    "bg_input_container": "rgba(15, 23, 42, 0.98)",
-    "bg_input": "#1e293b",
-    "bg_input_focus": "#1e293b",
-    "bg_user_msg": "linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #3b82f6 100%)",
-    "bg_bot_msg": "linear-gradient(145deg, #1f2937 0%, #1a202e 100%)",
-    "bg_feature_card": "#1e293b",
-    "bg_suggestion": "#1e293b",
-
-    # Text colors - Soft & Readable
-    "text_primary": "#f1f5f9",
-    "text_secondary": "#cbd5e1",  # Sáng hơn từ #94a3b8 - dễ nhìn hơn
-    "text_sidebar": "#e2e8f0",
-    "text_user_msg": "#ffffff",
-    "text_bot_msg": "#e5e7eb",
-    "text_input": "#f1f5f9",
-    "text_placeholder": "#94a3b8",  # Sáng hơn từ #64748b - rõ ràng hơn
-
-    # Border colors - Visible with Glow
-    "border_header": "rgba(30, 41, 59, 0.8)",
-    "border_input": "#334155",
-    "border_input_focus": "#3b82f6",
-    "border_bot_msg": "rgba(59, 130, 246, 0.2)",
-    "border_feature_card": "rgba(59, 130, 246, 0.15)",
-    "border_suggestion": "#334155",
-
-    # Icon colors
-    "icon_sidebar": "#94a3b8",
+    "primary": PRIMARY_LIGHT, "secondary": ACCENT_INDIGO, "accent": ACCENT_SKY,
+    "bg_app": "radial-gradient(ellipse at 20% 0%, #1e3a5f 0%, #0f172a 40%, #020617 100%)",
+    "bg_sidebar": "linear-gradient(180deg, rgba(2, 6, 23, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%)",
+    "bg_header": "rgba(15, 23, 42, 0.9)", "bg_chat": "rgba(15, 23, 42, 0.8)",
+    "bg_input_container": "rgba(15, 23, 42, 0.85)", "bg_input": "rgba(30, 41, 59, 0.8)",
+    "bg_input_focus": "rgba(30, 41, 59, 0.95)",
+    "bg_user_msg": f"linear-gradient(135deg, {PRIMARY_BLUE} 0%, {PRIMARY_LIGHT} 100%)",
+    "bg_bot_msg": "linear-gradient(145deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)",
+    "bg_feature_card": "rgba(30, 41, 59, 0.8)", "bg_suggestion": "rgba(30, 41, 59, 0.7)",
+    "text_primary": "#f1f5f9", "text_secondary": "#94a3b8", "text_sidebar": "#e2e8f0",
+    "text_user_msg": "#ffffff", "text_bot_msg": "#e2e8f0", "text_input": "#f1f5f9", "text_placeholder": "#64748b",
+    "border_header": "rgba(59, 130, 246, 0.2)", "border_input": "rgba(59, 130, 246, 0.25)",
+    "border_input_focus": PRIMARY_LIGHT, "border_bot_msg": "rgba(59, 130, 246, 0.25)",
+    "border_feature_card": "rgba(59, 130, 246, 0.2)", "border_suggestion": "rgba(59, 130, 246, 0.25)",
+    "glass_bg": "rgba(15, 23, 42, 0.85)", "glass_border": "rgba(59, 130, 246, 0.2)",
+    "glow_primary": "0 30px 70px rgba(59, 130, 246, 0.15)",
+    "icon_sidebar": "#93c5fd", "icon_active": "#60a5fa",
 }
 
-# Legacy COLORS (deprecated - keep for compatibility)
 COLORS = LIGHT_COLORS
 
-# ============================================================================
-# SPACING - Khoảng cách chuẩn
-# ============================================================================
-# Sử dụng hệ thống 4px base (giống Tailwind)
-# 
-# NOTE: Reflex components (HStack, VStack) chỉ nhận spacing là string '0'-'9'
-# không nhận rem units. Dùng SPACING_REM cho các prop khác (padding, margin...)
-
-SPACING = {
-    "xs": "1",    # Nhỏ
-    "sm": "2",    # Small
-    "md": "4",    # Medium (mặc định)
-    "lg": "6",    # Large
-    "xl": "8",    # Extra large
-    "2xl": "9",   # 2X Large
+# Gradients
+GRADIENTS = {
+    "primary": f"linear-gradient(135deg, {PRIMARY_BLUE} 0%, {PRIMARY_LIGHT} 100%)",
+    "secondary": f"linear-gradient(135deg, {ACCENT_INDIGO} 0%, {ACCENT_VIOLET} 100%)",
+    "sidebar": "linear-gradient(180deg, #1e3a5f 0%, #1e293b 100%)",
 }
 
-# Spacing với đơn vị rem (cho padding, margin, gap...)
-SPACING_REM = {
-    "xs": "0.25rem",   # 4px
-    "sm": "0.5rem",    # 8px
-    "md": "1rem",      # 16px
-    "lg": "1.5rem",    # 24px
-    "xl": "2rem",      # 32px
-    "2xl": "3rem",     # 48px
-}
+# Spacing
+SPACING = {"xs": "1", "sm": "2", "md": "4", "lg": "6", "xl": "8", "2xl": "9"}
+SPACING_REM = {"xs": "0.25rem", "sm": "0.5rem", "md": "1rem", "lg": "1.5rem", "xl": "2rem", "2xl": "3rem"}
 
-# ============================================================================
-# FONT SIZES - Kích thước chữ
-# ============================================================================
+# Font sizes
+FONT_SIZES = {"xs": "0.75rem", "sm": "0.875rem", "md": "1rem", "lg": "1.125rem", "xl": "1.25rem", "2xl": "1.5rem",
+              "3xl": "1.875rem"}
 
-FONT_SIZES = {
-    "xs": "0.75rem",   # 12px
-    "sm": "0.875rem",  # 14px
-    "md": "1rem",      # 16px
-    "lg": "1.125rem",  # 18px
-    "xl": "1.25rem",   # 20px
-    "2xl": "1.5rem",   # 24px
-    "3xl": "1.875rem", # 30px
-}
+# Border radius
+RADIUS = {"sm": "0.375rem", "md": "0.5rem", "lg": "0.75rem", "xl": "1rem", "2xl": "1.25rem", "3xl": "1.5rem",
+          "full": "9999px"}
 
-# ============================================================================
-# BORDER RADIUS - Bo góc
-# ============================================================================
-
-RADIUS = {
-    "sm": "0.25rem",   # 4px
-    "md": "0.5rem",    # 8px
-    "lg": "0.75rem",   # 12px
-    "xl": "1rem",      # 16px
-    "full": "9999px",  # Tròn hoàn toàn
-}
-
-# ============================================================================
-# SHADOWS - Đổ bóng
-# ============================================================================
-
+# Shadows
 SHADOWS = {
-    "sm": "0 1px 2px rgb(0 0 0 / 0.04)",
-    "md": "0 2px 6px rgb(0 0 0 / 0.06)",
-    "lg": "0 8px 20px rgb(0 0 0 / 0.08)",
-    "xl": "0 12px 28px rgb(0 0 0 / 0.10)",
+    "sm": "0 1px 2px rgba(0, 0, 0, 0.05)", "md": "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    "lg": "0 10px 15px -3px rgba(0, 0, 0, 0.1)", "xl": "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+    "2xl": "0 25px 50px -12px rgba(0, 0, 0, 0.25)", "glow_blue": "0 20px 40px rgba(37, 99, 235, 0.25)",
 }
 
-# ============================================================================
-# BREAKPOINTS - Responsive design
-# ============================================================================
-# Điểm chuyển đổi cho mobile, tablet, desktop
+# Breakpoints
+BREAKPOINTS = {"mobile": "640px", "tablet": "768px", "desktop": "1024px", "wide": "1280px"}
 
-BREAKPOINTS = {
-    "mobile": "640px",   # sm
-    "tablet": "768px",   # md
-    "desktop": "1024px", # lg
-}
+# Transitions
+TRANSITIONS = {"fast": "150ms ease-out", "normal": "250ms ease-out", "slow": "400ms ease-out",
+               "bounce": "400ms cubic-bezier(0.34, 1.56, 0.64, 1)"}
 
-# ============================================================================
-# TRANSITIONS - Animation timing
-# ============================================================================
-
-TRANSITIONS = {
-    "fast": "150ms ease-in-out",
-    "normal": "300ms ease-in-out",
-    "slow": "500ms ease-in-out",
-}
-
-# ============================================================================
-# DIMENSIONS - Kích thước cố định
-# ============================================================================
-
+# Dimensions
 DIMENSIONS = {
-    # Chat container
-    "chat_max_width": "1200px",
-    "chat_height": "600px",
-    
-    # Sidebar/Header
-    "header_height": "64px",
-    
-    # Input box
-    "input_min_height": "48px",
-    "input_max_height": "120px",
-    
-    # Message bubble
-    "bubble_max_width": "70%",
+    "chat_max_width": "1400px", "chat_height": "600px", "header_height": "64px",
+    "sidebar_width": "280px", "history_width": "260px", "input_min_height": "52px",
+    "input_max_height": "120px", "bubble_max_width": "75%",
 }
 
-# ============================================================================
-# Z-INDEX - Thứ tự chồng lớp
-# ============================================================================
-
-Z_INDEX = {
-    "base": 0,
-    "dropdown": 10,
-    "sticky": 20,
-    "modal_backdrop": 30,
-    "modal": 40,
-    "popover": 50,
-    "tooltip": 60,
-}
-
+# Z-index
+Z_INDEX = {"base": 0, "dropdown": 10, "sticky": 20, "modal_backdrop": 30, "modal": 40, "popover": 50, "tooltip": 60}

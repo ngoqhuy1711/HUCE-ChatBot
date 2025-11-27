@@ -96,6 +96,7 @@ def find_standard_score(
 
     return results
 
+
 def suggest_majors_by_score(request_data: Dict[str, Any]) -> List[Dict[str, Any]]:
     """
     Gợi ý ngành học dựa trên điểm số hoặc chứng chỉ

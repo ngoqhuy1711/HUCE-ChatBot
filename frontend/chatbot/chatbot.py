@@ -1,30 +1,23 @@
-"""
-Chatbot Main App
-================
-
-File chính (entry point) của Reflex app.
-
-Chạy app:
-    cd frontend
-    reflex run
-
-App sẽ chạy tại: http://localhost:3000
-"""
+"""Chatbot Main App - HUCE Chatbot."""
 
 import reflex as rx
 from chatbot.components import chat_interface
 from chatbot.state import ChatState
 
+# Global styles
+FONT_FAMILY = "'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif"
+MONO_FONT = "'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace"
 
-# ============================================================================
-# GLOBAL STYLES
-# ============================================================================
-
-# Modern font stack với fallbacks
-FONT_FAMILY = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif"
-
-# CSS reset với enhanced typography
 global_style = {
+    "@import": [
+        "url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap')",
+        "url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap')",
+    ],
+
+    "*, *::before, *::after": {
+        "box-sizing": "border-box",
+    },
+
     "body": {
         "margin": "0",
         "padding": "0",
@@ -34,99 +27,94 @@ global_style = {
         "-webkit-font-smoothing": "antialiased",
         "-moz-osx-font-smoothing": "grayscale",
         "text-rendering": "optimizeLegibility",
+        "font-feature-settings": "'cv02', 'cv03', 'cv04', 'cv11'",
     },
+
     "#root": {
         "width": "100vw",
         "height": "100vh",
         "overflow": "hidden",
     },
-    # Import Inter font from Google Fonts
-    "@import": "url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap')",
+
+    # Custom scrollbar styling
+    "::-webkit-scrollbar": {
+        "width": "6px",
+        "height": "6px",
+    },
+    "::-webkit-scrollbar-track": {
+        "background": "transparent",
+    },
+    "::-webkit-scrollbar-thumb": {
+        "background": "rgba(6, 182, 212, 0.3)",
+        "border-radius": "999px",
+    },
+    "::-webkit-scrollbar-thumb:hover": {
+        "background": "rgba(6, 182, 212, 0.5)",
+    },
+
+    # Selection styling
+    "::selection": {
+        "background": "rgba(6, 182, 212, 0.25)",
+        "color": "inherit",
+    },
+
+    # Focus outline
+    ":focus-visible": {
+        "outline": "2px solid #06b6d4",
+        "outline-offset": "2px",
+    },
+
+    # Button reset
+    "button": {
+        "font-family": "inherit",
+    },
+
+    # Input reset
+    "input, textarea": {
+        "font-family": "inherit",
+    },
+
+    # Code styling
+    "code, pre": {
+        "font-family": MONO_FONT,
+    },
 }
 
-# Script để auto-detect theme từ browser
-THEME_DETECT_SCRIPT = """
-<script>
-(function() {
-    // Check if browser supports prefers-color-scheme
-    if (window.matchMedia) {
-        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        
-        // Set initial theme
-        const initialTheme = darkModeQuery.matches ? 'dark' : 'light';
-        
-        // Trigger theme change in Reflex state
-        if (window._update_theme) {
-            window._update_theme(initialTheme);
-        }
-        
-        // Listen for changes
-        darkModeQuery.addEventListener('change', (e) => {
-            const newTheme = e.matches ? 'dark' : 'light';
-            if (window._update_theme) {
-                window._update_theme(newTheme);
-            }
-        });
-    }
-})();
-</script>
-"""
+# ============================================================================
+# APP METADATA
+# ============================================================================
+
+app_name = "HUCE Bot - Tra cứu tuyển sinh"
+app_description = "Chatbot hỗ trợ tra cứu thông tin tuyển sinh Đại học Xây dựng Hà Nội (HUCE) 2025"
 
 
 # ============================================================================
-# APP CONFIGURATION
-# ============================================================================
-
-# Metadata cho app
-app_name = "Tra cứu thông tin tuyển sinh HUCE"
-app_description = "Chatbot hỗ trợ tra cứu thông tin tuyển sinh Đại học Xây dựng Hà Nội"
-
-
-# ============================================================================
-# PAGES - Định nghĩa các trang
+# PAGES
 # ============================================================================
 
 def index() -> rx.Component:
-    """
-    Trang chính (home page).
-    
-    Returns:
-        rx.Component - Chat interface
-    """
+    """Trang chính (home page)."""
     return rx.fragment(
-        # Script để auto-detect theme
+        # Theme detection script
         rx.script("""
-            // Auto-detect theme từ browser preference
             (function() {
                 if (window.matchMedia) {
                     const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
                     
-                    // Set initial theme
                     const setTheme = (isDark) => {
-                        // Trigger Reflex state update
                         const theme = isDark ? 'dark' : 'light';
-                        console.log('Browser theme detected:', theme);
-                        
-                        // Try to update Reflex state if available
-                        if (window.setTheme) {
-                            window.setTheme(theme);
-                        }
-                        
-                        // Store in localStorage as fallback
+                        console.log('Theme detected:', theme);
                         localStorage.setItem('theme', theme);
                     };
                     
-                    // Set initial theme
                     setTheme(darkModeQuery.matches);
                     
-                    // Listen for changes
                     darkModeQuery.addEventListener('change', (e) => {
                         setTheme(e.matches);
                     });
                 }
             })();
         """),
-
         chat_interface(),
     )
 
@@ -135,28 +123,26 @@ def index() -> rx.Component:
 # APP INITIALIZATION
 # ============================================================================
 
-# Tạo Reflex app với global styles
 app = rx.App(
     style=global_style,
+    stylesheets=[
+        "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap",
+        "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap",
+    ],
 )
 
 # Add pages
 app.add_page(
     index,
-    route="/",  # Root route
+    route="/",
     title=app_name,
     description=app_description,
-    
-    # Lifecycle
-    on_load=ChatState.on_load,  # Gọi khi page load
+    on_load=ChatState.on_load,
 )
-
 
 # ============================================================================
 # ENTRY POINT
 # ============================================================================
 
 if __name__ == "__main__":
-    # Note: Không nên chạy trực tiếp file này
-    # Dùng: reflex run
     pass

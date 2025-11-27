@@ -1,182 +1,104 @@
-"""
-Input Box - HUCE Style with Dark/Light Mode
-============================================
-
-Input box theo phong cách HUCE với hỗ trợ dark/light mode.
-"""
+"""Input Box - Ô nhập tin nhắn."""
 
 import reflex as rx
-from chatbot.styles.theme import (
-    LIGHT_COLORS, DARK_COLORS, SPACING, SPACING_REM, RADIUS, FONT_SIZES
-)
 from chatbot.state import ChatState
+from chatbot.styles.theme import (
+    LIGHT_COLORS,
+    DARK_COLORS,
+    PRIMARY_BLUE,
+    PRIMARY_LIGHT,
+)
 
 
 def input_box() -> rx.Component:
-    """Input box HUCE style với dark/light mode."""
+    """Input box với style xanh lam."""
     return rx.box(
-        rx.box(
-            rx.form(
-                rx.hstack(
-                    # Input field - tối giản
-                    rx.input(
-                        value=ChatState.input_value,
-                        on_change=ChatState.handle_input_change,
-                        placeholder="Nhập câu hỏi về tuyển sinh của bạn...",
-                        name="message",
-                        size="2",
-                        width="100%",
-                        disabled=ChatState.is_loading,
-                        style={
-                            # Border và background phẳng
-                            "border": rx.cond(
-                                ChatState.theme_mode == "dark",
-                                f"1px solid {DARK_COLORS['border_input']}",
-                                f"1px solid {LIGHT_COLORS['border_input']}",
-                            ),
-                            "background": rx.cond(
-                                ChatState.theme_mode == "dark",
-                                DARK_COLORS["bg_input"],
-                                LIGHT_COLORS["bg_input"],
-                            ),
-                            "border-radius": "16px",
-
-                            # Font size lớn hơn
-                            "font-size": "1.05rem",
-                            "padding": "1rem 1.25rem",
-                            "height": "56px",
-
-                            # Color
-                            "color": rx.cond(
-                                ChatState.theme_mode == "dark",
-                                DARK_COLORS["text_input"],
-                                LIGHT_COLORS["text_input"],
-                            ),
-                            
-                            # Animation nhẹ
-                            "transition": "border-color 0.2s, box-shadow 0.2s, background 0.2s",
-                            
-                            # Placeholder với contrast tốt hơn
-                            "&::placeholder": {
-                                "color": rx.cond(
-                                    ChatState.theme_mode == "dark",
-                                    "#cbd5e1",  # Light slate - sáng hơn cho dark mode
-                                    "#475569",  # Dark slate - tối hơn cho light mode
-                                ),
-                                "font-size": "0.95rem",
-                                "opacity": "0.8",  # Thêm opacity để softer
-                            },
-                            
-                            # Focus state tinh gọn
-                            "&:focus": {
-                                "border-color": rx.cond(
-                                    ChatState.theme_mode == "dark",
-                                    DARK_COLORS["border_input_focus"],
-                                    LIGHT_COLORS["border_input_focus"],
-                                ),
-                                "background": rx.cond(
-                                    ChatState.theme_mode == "dark",
-                                    DARK_COLORS["bg_input_focus"],
-                                    LIGHT_COLORS["bg_input_focus"],
-                                ),
-                                "box-shadow": rx.cond(
-                                    ChatState.theme_mode == "dark",
-                                    "0 0 0 3px rgba(79,141,246,0.15)",
-                                    "0 0 0 3px rgba(0,82,204,0.15)",
-                                ),
-                                "outline": "none",
-                            },
-                            
-                            # Hover state tinh gọn
-                            "&:hover": {
-                                "border-color": rx.cond(
-                                    ChatState.theme_mode == "dark",
-                                    DARK_COLORS["border_input_focus"],
-                                    LIGHT_COLORS["border_input_focus"],
-                                ),
-                                "background": rx.cond(
-                                    ChatState.theme_mode == "dark",
-                                    DARK_COLORS["bg_input_focus"],
-                                    LIGHT_COLORS["bg_input_focus"],
-                                ),
-                            },
-                        },
-                    ),
-                    
-                    # Send button với vibrant gradient
-                    rx.button(
-                        rx.cond(
-                            ChatState.is_loading,
-                            rx.spinner(size="3", color="white"),
-                            rx.icon("send", size=22, color="white"),
-                        ),
-                        
-                        type="submit",
-                        
-                        width="56px",
-                        height="56px",
-                        padding="0",
-                        background="linear-gradient(135deg, #0052CC 0%, #2563eb 100%)",
-                        border="none",
-                        border_radius="16px",
-                        cursor="pointer",
-                        box_shadow="0 4px 12px rgba(0, 82, 204, 0.3)",
-                        transition="all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)",
-
-                        _hover={
-                            "transform": "translateY(-2px) scale(1.05)",
-                            "box_shadow": "0 8px 20px rgba(0, 82, 204, 0.4)",
-                            "background": "linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)",
-                        },
-                        
-                        _active={
-                            "transform": "translateY(0) scale(0.98)",
-                        },
-                        
-                        disabled=ChatState.is_loading,
-                    ),
-                    
-                    spacing=SPACING["md"],
+        rx.form(
+            rx.hstack(
+                rx.input(
+                    value=ChatState.input_value,
+                    on_change=ChatState.handle_input_change,
+                    name="message",
+                    disabled=ChatState.is_loading,
                     width="100%",
-                    max_width="900px",
+                    height="46px",
+                    variant="surface",
+                    radius="large",
+                    style={
+                        "border": "none !important",
+                        "background": "transparent !important",
+                        "font-size": "1rem",
+                        "font-weight": "500",
+                        "padding": "0 16px",
+                        "box-shadow": "none !important",
+                        "outline": "none !important",
+                        "color": rx.cond(ChatState.theme_mode == "dark", "#f1f5f9", "#1e293b"),
+                        "--text-field-focus-color": "transparent",
+                        "--focus-8": "transparent",
+                        "&:focus, &:focus-within, &:focus-visible": {
+                            "box-shadow": "none !important",
+                            "outline": "none !important",
+                            "border": "none !important",
+                        },
+                        "&::placeholder": {
+                            "color": rx.cond(ChatState.theme_mode == "dark", "#94a3b8", "#64748b"),
+                            "font-weight": "400",
+                            "opacity": "1",
+                        },
+                        "& input": {"outline": "none !important", "box-shadow": "none !important"},
+                    },
+                ),
+                rx.button(
+                    rx.cond(
+                        ChatState.is_loading,
+                        rx.spinner(size="3", color="white"),
+                        rx.icon("send", size=18, color="white"),
+                    ),
+                    type="submit",
+                    width="42px",
+                    height="42px",
+                    padding="0",
+                    display="flex",
                     align_items="center",
+                    justify_content="center",
+                    background=f"linear-gradient(135deg, {PRIMARY_BLUE} 0%, {PRIMARY_LIGHT} 100%)",
+                    border="none",
+                    border_radius="12px",
+                    cursor="pointer",
+                    box_shadow="0 4px 12px rgba(37, 99, 235, 0.3)",
+                    transition="all 0.2s ease",
+                    flex_shrink="0",
+                    _hover={"transform": "translateY(-1px)", "box_shadow": "0 6px 16px rgba(37, 99, 235, 0.4)"},
+                    _active={"transform": "translateY(0)"},
+                    disabled=ChatState.is_loading,
                 ),
-                
-                on_submit=ChatState.send_message,
+                spacing="2",
                 width="100%",
-                display="flex",
-                justify_content="center",
+                align_items="center",
+                padding="4px 6px 4px 4px",
+                background=rx.cond(ChatState.theme_mode == "dark", "rgba(15, 23, 42, 0.7)",
+                                   "rgba(255, 255, 255, 0.98)"),
+                border=rx.cond(ChatState.theme_mode == "dark", "1px solid rgba(59, 130, 246, 0.3)",
+                               "1px solid rgba(37, 99, 235, 0.2)"),
+                border_radius="14px",
+                box_shadow=rx.cond(ChatState.theme_mode == "dark", "0 4px 20px rgba(0, 0, 0, 0.25)",
+                                   "0 4px 20px rgba(37, 99, 235, 0.1)"),
             ),
-            
-            # Footer text với better typography
-            rx.text(
-                "Nhấn Enter để gửi • Powered by HUCE AI",
-                font_size="0.875rem",
-                font_weight="500",
-                color=rx.cond(
-                    ChatState.theme_mode == "dark",
-                    "#64748b",
-                    "#94a3b8",
-                ),
-                text_align="center",
-                margin_top=SPACING_REM["md"],
-                letter_spacing="-0.01em",
-            ),
-            
+            on_submit=ChatState.send_message,
             width="100%",
-            padding=f"{SPACING_REM['xl']} {SPACING_REM['xl']}",
         ),
-        
+        rx.hstack(
+            rx.text("Nhấn Enter để gửi", font_size="0.7rem",
+                    color=rx.cond(ChatState.theme_mode == "dark", "#64748b", "#94a3b8")),
+            rx.spacer(),
+            rx.hstack(
+                rx.text("Powered by", font_size="0.7rem",
+                        color=rx.cond(ChatState.theme_mode == "dark", "#64748b", "#94a3b8")),
+                rx.text("HUCE Bot", font_size="0.7rem", font_weight="600", color=PRIMARY_BLUE),
+                spacing="1",
+            ),
+            width="100%",
+            padding="6px 8px 2px 8px",
+        ),
         width="100%",
-        background=rx.cond(
-            ChatState.theme_mode == "dark",
-            DARK_COLORS["bg_input_container"],
-            LIGHT_COLORS["bg_input_container"],
-        ),
-        border_top=rx.cond(
-            ChatState.theme_mode == "dark",
-            f"1px solid {DARK_COLORS['border_header']}",
-            f"1px solid {LIGHT_COLORS['border_header']}",
-        ),
-        box_shadow="0 -2px 12px rgba(0, 0, 0, 0.04)",
     )
